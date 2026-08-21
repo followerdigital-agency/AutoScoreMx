@@ -347,14 +347,15 @@ Ver reporte de ejemplo
 </div>
 </div>
 </div>
-<span class="material-symbols-outlined text-primary-container animate-bounce absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:block" aria-hidden="true">arrow_downward</span>
+<div class="hidden md:flex flex-col items-center gap-4 mt-10">
+<img src="logo.png" alt="AutoScore" width="52" height="32" class="h-8 w-auto opacity-90"/>
+<span class="material-symbols-outlined text-primary-container animate-bounce" aria-hidden="true">arrow_downward</span>
+</div>
 </section>
 
 <!-- Prueba social -->
 <section class="bg-surface-container-lowest border-y border-outline-variant py-10 px-margin-mobile md:px-margin-desktop">
-<div class="max-w-7xl mx-auto flex flex-col gap-6">
-<img src="logo.png" alt="AutoScore" class="hidden md:block h-8 w-auto mx-auto"/>
-<div class="flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
 <div class="grid grid-cols-3 gap-3 sm:gap-8 md:gap-16 text-center md:text-left">
 <div>
 <p class="text-headline-lg font-headline-lg text-primary-container">+2,400</p>
@@ -372,7 +373,6 @@ Ver reporte de ejemplo
 <a id="ejemplo-reporte" href="#" class="shrink-0 text-primary-container font-label-bold hover:text-primary transition-colors flex items-center gap-2 border border-outline-variant rounded-full px-6 py-3">
 Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span>
 </a>
-</div>
 </div>
 
 </section>
@@ -639,9 +639,8 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 <div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Detección de inconsistencias</span></div>
 <div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Precio de mercado</span></div>
 <div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Análisis de imágenes</span></div>
-<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Principales hallazgos</span></div>
 <div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Recomendaciones</span></div>
-<div class="flex items-center gap-3 text-on-surface md:col-span-2"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Checklist de puntos a validar</span></div>
+<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Checklist de puntos a validar</span></div>
 </div>
 <button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="w-full bg-primary-container text-on-primary-fixed font-label-bold py-5 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg whitespace-nowrap">
 <span>Analizar mi auto</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
@@ -782,6 +781,12 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 </div>
 </div>
 </footer>
+
+<!-- Widget flotante de WhatsApp: visible en toda la landing mientras se hace scroll -->
+<!-- NOTA: reemplazar el número 5215500000000 por el WhatsApp Business real de AutoScoreMX antes de publicar -->
+<a href="https://wa.me/5215500000000?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20AutoScore" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-110" style="background:#25D366" aria-label="Chatea con nosotros por WhatsApp">
+<svg viewBox="0 0 24 24" width="28" height="28" fill="#ffffff" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm5.8 14.07c-.24.68-1.4 1.33-1.93 1.4-.5.07-1.1.1-1.78-.11-.41-.13-.94-.3-1.62-.6-2.86-1.24-4.72-4.13-4.86-4.32-.14-.19-1.16-1.55-1.16-2.96 0-1.4.74-2.09 1-2.38.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.09.19-.14.31-.28.48-.14.16-.29.36-.42.49-.14.14-.28.28-.12.56.16.28.72 1.19 1.55 1.93 1.06.95 1.96 1.24 2.24 1.38.28.14.44.12.61-.07.16-.19.7-.81.88-1.09.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36z"></path></svg>
+</a>
 
 <script>
     // Toggle del menú móvil
