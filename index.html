@@ -153,6 +153,15 @@
             animation: fadeInDown 0.3s ease-out forwards;
         }
 
+        /* Animación de "carga" de la aguja del AutoScore al entrar a la página */
+        @keyframes needleSweep {
+            from { transform: rotate(-90deg); }
+            to { transform: rotate(57.6deg); }
+        }
+        .gauge-needle {
+            animation: needleSweep 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+        }
+
         /* Accesibilidad: foco de teclado visible en todos los elementos interactivos */
         a:focus-visible,
         button:focus-visible,
@@ -194,6 +203,28 @@
         }
         #mobile-menu.open {
             display: flex;
+        }
+
+        /* Chips de selección única (Lugar de compra) */
+        .lugar-chip {
+            padding: 10px 16px;
+            border-radius: 9999px;
+            border: 1px solid #3A3A3A;
+            background: #19221a;
+            color: #c7d6c6;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .lugar-chip:hover {
+            border-color: #859585;
+        }
+        .lugar-chip.selected {
+            background: #00e678;
+            border-color: #00e678;
+            color: #003919;
+            font-weight: 700;
         }
     </style>
 </head>
@@ -238,22 +269,22 @@
 <!-- Hero Section -->
 <section class="hero-bg py-10 md:py-20 px-margin-mobile md:px-margin-desktop relative overflow-hidden md:min-h-[85vh] flex items-center">
 <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[40%_60%] gap-12 lg:gap-xl items-center relative z-10 w-full">
-<div class="flex flex-col gap-6">
-<span class="text-primary-container font-label-bold tracking-widest uppercase">Antes de comprar un auto usado</span>
+<div class="flex flex-col gap-6 max-w-xl">
+<span class="text-primary-container font-label-bold tracking-widest uppercase">Análisis inteligente de vehículos</span>
 <h1 class="text-display-lg font-display-lg text-on-background leading-tight">
 ¿Estás por comprar un <span class="text-primary-container">auto usado</span>?
 </h1>
 <h2 class="text-headline-md font-headline-md text-on-background">
 Conoce el <span class="text-primary-container">riesgo</span> antes de entregar tu dinero.
 </h2>
-<p class="text-body-lg font-body-lg text-on-surface-variant max-w-xl">
+<p class="text-body-lg font-body-lg text-on-surface-variant">
 Analizamos la información disponible del vehículo, detectamos inconsistencias y te ayudamos a tomar una mejor decisión de compra.
 </p>
-<div class="flex flex-col sm:flex-row items-center gap-4 mt-4">
-<button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="bg-primary-container text-on-primary-fixed font-label-bold px-8 py-4 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg w-full sm:w-auto">
-Analizar mi auto →
+<div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 mt-4">
+<button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="bg-primary-container text-on-primary-fixed font-label-bold px-8 py-4 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg whitespace-nowrap w-full sm:w-auto">
+<span>Analizar mi auto</span> <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span>
 </button>
-<a href="#ejemplo-reporte" class="border border-outline-variant text-on-background font-label-bold px-8 py-4 rounded-full hover:bg-surface-variant transition-all flex items-center justify-center gap-2 text-body-lg w-full sm:w-auto">
+<a href="#ejemplo-reporte" class="border border-outline-variant text-on-background font-label-bold px-8 py-4 rounded-full hover:bg-surface-variant transition-all flex items-center justify-center gap-2 text-body-lg whitespace-nowrap w-full sm:w-auto">
 Ver reporte de ejemplo
 </a>
 </div>
@@ -284,7 +315,7 @@ Ver reporte de ejemplo
 </defs>
 <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#333" stroke-linecap="round" stroke-width="14"></path>
 <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" stroke-dasharray="251" stroke-dashoffset="45" stroke-linecap="round" stroke-width="14"></path>
-<g transform="rotate(57.6, 100, 100)">
+<g class="gauge-needle" style="transform-origin: 100px 100px;">
 <polygon fill="#fff" points="98,100 102,100 100,45"></polygon>
 <circle cx="100" cy="100" fill="#fff" r="6"></circle>
 </g>
@@ -419,8 +450,8 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 <div class="flex flex-col items-center text-center gap-6 mt-4 max-w-2xl mx-auto">
 <h3 class="text-headline-md font-headline-md text-on-background uppercase tracking-widest">Más señales. Una decisión más informada.</h3>
 <p class="text-body-lg font-body-lg text-on-surface-variant">AutoScore reúne la información relevante del vehículo para ayudarte a entender qué debes revisar antes de comprar.</p>
-<a class="text-primary-container font-label-bold hover:text-primary transition-colors flex items-center gap-2 text-body-lg" href="#como-funciona">
-        Conoce cómo funciona <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+<a class="text-primary-container font-label-bold hover:text-primary transition-colors flex flex-col items-center gap-1 text-body-lg" href="#como-funciona">
+        <span>Conoce cómo funciona</span> <span class="material-symbols-outlined animate-bounce" aria-hidden="true">arrow_downward</span>
 </a>
 </div>
 </div>
@@ -444,7 +475,7 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 <div class="w-full max-w-xs bg-surface border border-outline-variant rounded-xl p-5 shadow-2xl z-10 flex flex-col gap-4">
 <p class="text-body-md font-headline-md text-on-background text-center">¿Qué auto estás pensando comprar?</p>
 <div class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-surface-variant text-label-sm font-label-sm w-full">
-                            VIN, placas o link del anuncio
+                            Marca, modelo y año
                         </div>
 <button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="w-full bg-primary-container text-on-primary-fixed py-2.5 rounded-full font-label-bold flex items-center justify-center gap-2">
                             Continuar <span class="material-symbols-outlined text-sm" aria-hidden="true">arrow_forward</span>
@@ -455,7 +486,7 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 <div class="flex flex-col gap-2">
 <span class="text-primary-container font-label-bold text-xl">01</span>
 <h3 class="text-headline-md font-headline-md text-on-background">Comparte el auto</h3>
-<p class="text-body-md font-body-md text-on-surface-variant">Ingresa el VIN, placas o la información disponible del vehículo.</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Dinos la marca, modelo, año y dónde lo estás comprando.</p>
 </div>
 </div>
 <div class="flex flex-col gap-6">
@@ -515,43 +546,58 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 </div>
 </div>
 </div>
-
-<div class="flex flex-col items-center text-center gap-6 max-w-2xl mx-auto mt-8">
-<h3 class="text-display-lg font-display-lg text-on-background">Menos dudas. Más información para decidir.</h3>
-<p class="text-body-lg font-body-lg text-on-surface-variant">AutoScore no decide por ti. Te ayuda a entender mejor el vehículo que estás considerando comprar.</p>
-<button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="text-primary-container font-label-bold hover:text-primary transition-colors flex items-center gap-2 text-body-lg mt-2">
-                Analizar mi auto <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-</button>
-</div>
 </div>
 </section>
 
-<!-- Formulario de análisis (funcional en el front, listo para conectar a backend/pago) -->
+<!-- Formulario de análisis (front-end funcional, consistente con Pantalla 01 de la app: marca/modelo/año + lugar de compra) -->
 <section class="bg-level-0 py-14 md:py-32 px-margin-mobile md:px-margin-desktop" id="analizar">
 <div class="max-w-2xl mx-auto w-full flex flex-col gap-8">
-<div class="flex flex-col items-center text-center gap-4">
-<span class="text-primary-container font-label-bold tracking-widest uppercase">Empieza aquí</span>
-<h2 class="text-headline-lg font-headline-lg text-on-background">¿Qué auto quieres analizar?</h2>
-<p class="text-body-md text-on-surface-variant">Sin crear cuenta. Recibirás tu reporte por correo o WhatsApp.</p>
+<div class="flex flex-col items-center text-center gap-3">
+<span class="text-primary-container font-label-bold tracking-widest uppercase">Comencemos</span>
+<h2 class="text-headline-lg font-headline-lg text-on-background">¿Qué auto estás pensando comprar?</h2>
+<p class="text-body-md text-on-surface-variant max-w-lg">Cuéntanos lo básico del vehículo que estás considerando y comenzaremos a preparar tu análisis.</p>
 </div>
-<form id="analisis-form" class="bg-[#2A2A2A] border border-outline-variant rounded-2xl p-6 md:p-8 flex flex-col gap-5" onsubmit="event.preventDefault(); document.getElementById('form-confirmacion').classList.remove('hidden'); this.classList.add('hidden');">
+<form id="analisis-form" class="bg-[#2A2A2A] border border-outline-variant rounded-2xl p-6 md:p-8 flex flex-col gap-6" novalidate="" onsubmit="return handleAnalisisSubmit(event)">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 <div class="flex flex-col gap-2">
-<label for="vin-input" class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">VIN, placas o link del anuncio</label>
-<input id="vin-input" name="vin" type="text" required placeholder="Ej. 9BWZZZ377VT004251" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/60 w-full"/>
+<label for="marca-input" class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">Marca</label>
+<input id="marca-input" name="marca" type="text" required="" placeholder="Ej. Audi" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/60 w-full"/>
 </div>
 <div class="flex flex-col gap-2">
-<label for="contacto-input" class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">Correo o WhatsApp para enviarte el reporte</label>
-<input id="contacto-input" name="contacto" type="text" required placeholder="tucorreo@ejemplo.com" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/60 w-full"/>
+<label for="modelo-input" class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">Modelo</label>
+<input id="modelo-input" name="modelo" type="text" required="" placeholder="Ej. A1" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/60 w-full"/>
 </div>
-<p class="text-label-sm text-on-surface-variant">Al continuar aceptas nuestro <a href="#" class="text-primary-container hover:text-primary underline">aviso de privacidad</a>. Usamos esta información solo para generar tu análisis.</p>
+<div class="flex flex-col gap-2">
+<label for="anio-input" class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">Año</label>
+<input id="anio-input" name="anio" type="number" inputmode="numeric" required="" placeholder="Ej. 2018" min="1980" max="2027" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/60 w-full"/>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">Lugar de compra</span>
+<div id="lugar-compra-group" class="flex flex-wrap gap-2" role="radiogroup" aria-label="Lugar de compra">
+<button type="button" class="lugar-chip" data-value="Agencia seminuevos" role="radio" aria-checked="false">Agencia seminuevos</button>
+<button type="button" class="lugar-chip" data-value="Lote de autos" role="radio" aria-checked="false">Lote de autos</button>
+<button type="button" class="lugar-chip" data-value="Venta directa" role="radio" aria-checked="false">Venta directa</button>
+<button type="button" class="lugar-chip" data-value="Marketplace" role="radio" aria-checked="false">Marketplace</button>
+<button type="button" class="lugar-chip" data-value="Kavak" role="radio" aria-checked="false">Kavak</button>
+<button type="button" class="lugar-chip" data-value="Mercado Libre" role="radio" aria-checked="false">Mercado Libre</button>
+<button type="button" class="lugar-chip" data-value="Otro" role="radio" aria-checked="false">Otro</button>
+</div>
+<p id="lugar-error" class="hidden text-label-sm" style="color:#FF5252">Selecciona dónde estás comprando el auto.</p>
+</div>
+<p class="text-label-sm text-on-surface-variant">Al continuar aceptas nuestro <a href="privacidad.html" class="text-primary-container hover:text-primary underline">aviso de privacidad</a>. Tu información se usa solo para preparar tu análisis.</p>
 <button type="submit" class="w-full bg-primary-container text-on-primary-fixed font-label-bold py-4 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg">
-Continuar al pago · $299 MXN
+<span>Continuar</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
 </button>
 </form>
 <div id="form-confirmacion" class="hidden bg-[#152e20] border border-primary-container/30 rounded-2xl p-8 text-center flex flex-col items-center gap-3">
 <span class="material-symbols-outlined text-primary-container" style="font-size:2.5rem" aria-hidden="true">check_circle</span>
 <p class="text-headline-md font-headline-md text-on-background">¡Listo! (vista previa de front-end)</p>
-<p class="text-body-md text-on-surface-variant max-w-md">Este es un prototipo del formulario. Aquí es donde se conectará el flujo de pago real y la generación del reporte.</p>
+<p class="text-body-md text-on-surface-variant max-w-md">Aquí seguiría el Paso 02 (información adicional) y el Paso 03 (pago) del flujo real.</p>
+</div>
+<div class="flex items-center justify-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" aria-hidden="true">lock</span>
+<span class="text-label-sm">Tu información se utiliza únicamente para preparar el análisis solicitado.</span>
 </div>
 </div>
 </section>
@@ -576,19 +622,19 @@ Continuar al pago · $299 MXN
 <p class="text-label-sm font-label-sm text-on-surface-variant">Pago único · Sin suscripción</p>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 mb-10">
-<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md">AutoScore de 0 a 100</span></div>
-<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md">Nivel de riesgo</span></div>
-<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md">Análisis de información</span></div>
-<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md">Detección de inconsistencias</span></div>
-<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md">Precio de mercado</span></div>
-<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md">Análisis del anuncio</span></div>
-<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md">Principales hallazgos</span></div>
-<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md">Recomendaciones</span></div>
-<div class="flex items-center gap-3 text-on-surface md:col-span-2"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md">Checklist de puntos a validar</span></div>
+<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">AutoScore de 0 a 100</span></div>
+<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Nivel de riesgo</span></div>
+<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Análisis de información</span></div>
+<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Detección de inconsistencias</span></div>
+<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Precio de mercado</span></div>
+<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Análisis del anuncio</span></div>
+<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Principales hallazgos</span></div>
+<div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Recomendaciones</span></div>
+<div class="flex items-center gap-3 text-on-surface md:col-span-2"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Checklist de puntos a validar</span></div>
 </div>
-<button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="w-full bg-primary-container text-on-primary-fixed font-label-bold py-5 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg">
-                    Analizar mi auto →
-                </button>
+<button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="w-full bg-primary-container text-on-primary-fixed font-label-bold py-5 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg whitespace-nowrap">
+<span>Analizar mi auto</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+</button>
 <div class="flex items-center justify-center gap-2 mt-4 text-on-surface-variant">
 <span class="material-symbols-outlined text-sm" aria-hidden="true">lock</span>
 <span class="text-label-sm">Pago seguro · Sin suscripción</span>
@@ -612,7 +658,7 @@ Continuar al pago · $299 MXN
 </div>
 <div class="w-full md:w-2/3 flex flex-col gap-4">
 <details class="group bg-level-1 border border-border-level-1 rounded-xl">
-<summary class="flex justify-between items-center font-headline-md text-body-lg md:text-headline-md p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
+<summary class="flex justify-between items-center font-headline-md text-base md:text-lg p-5 md:p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
 <span class="text-on-background font-semibold pr-4">¿Qué necesito para analizar un auto?</span>
 <span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:hidden" aria-hidden="true">add</span>
 <span class="material-symbols-outlined text-primary-container hidden group-open:block" aria-hidden="true">remove</span>
@@ -622,7 +668,7 @@ Continuar al pago · $299 MXN
                 </div>
 </details>
 <details class="group bg-level-1 border border-border-level-1 rounded-xl">
-<summary class="flex justify-between items-center font-headline-md text-body-lg md:text-headline-md p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
+<summary class="flex justify-between items-center font-headline-md text-base md:text-lg p-5 md:p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
 <span class="text-on-background font-semibold pr-4">¿Qué información analiza AutoScore?</span>
 <span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:hidden" aria-hidden="true">add</span>
 <span class="material-symbols-outlined text-primary-container hidden group-open:block" aria-hidden="true">remove</span>
@@ -632,7 +678,7 @@ Continuar al pago · $299 MXN
                 </div>
 </details>
 <details class="group bg-level-1 border border-border-level-1 rounded-xl">
-<summary class="flex justify-between items-center font-headline-md text-body-lg md:text-headline-md p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
+<summary class="flex justify-between items-center font-headline-md text-base md:text-lg p-5 md:p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
 <span class="text-on-background font-semibold pr-4">¿Cuánto tarda en estar listo el análisis?</span>
 <span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:hidden" aria-hidden="true">add</span>
 <span class="material-symbols-outlined text-primary-container hidden group-open:block" aria-hidden="true">remove</span>
@@ -642,7 +688,7 @@ Continuar al pago · $299 MXN
                 </div>
 </details>
 <details class="group bg-level-1 border border-border-level-1 rounded-xl">
-<summary class="flex justify-between items-center font-headline-md text-body-lg md:text-headline-md p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
+<summary class="flex justify-between items-center font-headline-md text-base md:text-lg p-5 md:p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
 <span class="text-on-background font-semibold pr-4">¿El AutoScore garantiza que el auto está en buenas condiciones?</span>
 <span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:hidden" aria-hidden="true">add</span>
 <span class="material-symbols-outlined text-primary-container hidden group-open:block" aria-hidden="true">remove</span>
@@ -652,7 +698,7 @@ Continuar al pago · $299 MXN
                 </div>
 </details>
 <details class="group bg-level-1 border border-border-level-1 rounded-xl">
-<summary class="flex justify-between items-center font-headline-md text-body-lg md:text-headline-md p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
+<summary class="flex justify-between items-center font-headline-md text-base md:text-lg p-5 md:p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
 <span class="text-on-background font-semibold pr-4">¿Qué significa mi AutoScore?</span>
 <span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:hidden" aria-hidden="true">add</span>
 <span class="material-symbols-outlined text-primary-container hidden group-open:block" aria-hidden="true">remove</span>
@@ -662,7 +708,7 @@ Continuar al pago · $299 MXN
                 </div>
 </details>
 <details class="group bg-level-1 border border-border-level-1 rounded-xl">
-<summary class="flex justify-between items-center font-headline-md text-body-lg md:text-headline-md p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
+<summary class="flex justify-between items-center font-headline-md text-base md:text-lg p-5 md:p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
 <span class="text-on-background font-semibold pr-4">¿Qué pasa si AutoScore detecta algo que debería preocuparme?</span>
 <span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:hidden" aria-hidden="true">add</span>
 <span class="material-symbols-outlined text-primary-container hidden group-open:block" aria-hidden="true">remove</span>
@@ -672,7 +718,7 @@ Continuar al pago · $299 MXN
                 </div>
 </details>
 <details class="group bg-level-1 border border-border-level-1 rounded-xl">
-<summary class="flex justify-between items-center font-headline-md text-body-lg md:text-headline-md p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
+<summary class="flex justify-between items-center font-headline-md text-base md:text-lg p-5 md:p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
 <span class="text-on-background font-semibold pr-4">¿Necesito ser experto en autos para entender el resultado?</span>
 <span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:hidden" aria-hidden="true">add</span>
 <span class="material-symbols-outlined text-primary-container hidden group-open:block" aria-hidden="true">remove</span>
@@ -682,7 +728,7 @@ Continuar al pago · $299 MXN
                 </div>
 </details>
 <details class="group bg-level-1 border border-border-level-1 rounded-xl">
-<summary class="flex justify-between items-center font-headline-md text-body-lg md:text-headline-md p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
+<summary class="flex justify-between items-center font-headline-md text-base md:text-lg p-5 md:p-6 cursor-pointer list-none [&amp;::-webkit-details-marker]:hidden">
 <span class="text-on-background font-semibold pr-4">¿El análisis sustituye una revisión mecánica?</span>
 <span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:hidden" aria-hidden="true">add</span>
 <span class="material-symbols-outlined text-primary-container hidden group-open:block" aria-hidden="true">remove</span>
@@ -715,7 +761,7 @@ Continuar al pago · $299 MXN
 <p class="text-on-surface-variant text-label-sm font-label-sm">© 2026 AutoScoreMX. Conoce el riesgo, toma la mejor decisión.</p>
 </div>
 <div class="flex flex-wrap justify-center gap-6 mt-4 md:mt-0">
-<a class="text-on-surface-variant text-label-sm font-label-sm hover:text-primary transition-colors duration-200" href="#">Privacidad</a>
+<a class="text-on-surface-variant text-label-sm font-label-sm hover:text-primary transition-colors duration-200" href="privacidad.html">Privacidad</a>
 <a class="text-on-surface-variant text-label-sm font-label-sm hover:text-primary transition-colors duration-200" href="#">Términos</a>
 <a class="text-on-surface-variant text-label-sm font-label-sm hover:text-primary transition-colors duration-200" href="#">Contacto</a>
 <a class="text-on-surface-variant text-label-sm font-label-sm hover:text-primary transition-colors duration-200" href="#">Soporte</a>
@@ -740,6 +786,41 @@ Continuar al pago · $299 MXN
             menuToggle.querySelector('.material-symbols-outlined').textContent = 'menu';
         });
     });
+
+    // Chips de "Lugar de compra" (selección única tipo radio)
+    let lugarSeleccionado = '';
+    const lugarChips = document.querySelectorAll('.lugar-chip');
+    lugarChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            lugarChips.forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-checked', 'false'); });
+            chip.classList.add('selected');
+            chip.setAttribute('aria-checked', 'true');
+            lugarSeleccionado = chip.dataset.value;
+            document.getElementById('lugar-error').classList.add('hidden');
+        });
+    });
+
+    // Validación del formulario de análisis (front-end únicamente)
+    function handleAnalisisSubmit(event) {
+        event.preventDefault();
+        const marca = document.getElementById('marca-input').value.trim();
+        const modelo = document.getElementById('modelo-input').value.trim();
+        const anio = document.getElementById('anio-input').value.trim();
+        const lugarError = document.getElementById('lugar-error');
+
+        if (!lugarSeleccionado) {
+            lugarError.classList.remove('hidden');
+            document.getElementById('lugar-compra-group').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        if (!marca || !modelo || !anio) {
+            return false;
+        }
+
+        document.getElementById('analisis-form').classList.add('hidden');
+        document.getElementById('form-confirmacion').classList.remove('hidden');
+        return false;
+    }
 </script>
 </body>
 </html>
