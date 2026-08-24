@@ -60,6 +60,7 @@
         }
         .photo-slot:hover { border-color: #00e678; }
         .photo-slot.filled { border-style: solid; border-color: #00e678; background: #152e20; }
+        .photo-status { margin-top: -2px; }
         .cat-pending { color: #6b7a6c; }
         .cat-done { color: #00e678; }
     </style>
@@ -181,33 +182,39 @@
 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
 <label class="photo-slot" data-slot="tablero">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'tablero')"/>
-<span class="material-symbols-outlined text-primary-container" aria-hidden="true">speed</span>
+<span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">speed</span>
 <span class="text-xs text-on-surface-variant">Tablero</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="tablero">✓ Cargado</span>
 </label>
 <label class="photo-slot" data-slot="niv">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'niv')"/>
-<span class="material-symbols-outlined text-primary-container" aria-hidden="true">qr_code_2</span>
+<span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">qr_code_2</span>
 <span class="text-xs text-on-surface-variant">NIV / Placa</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="niv">✓ Cargado</span>
 </label>
 <label class="photo-slot" data-slot="ext-frente">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-frente')"/>
-<span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
+<span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">directions_car</span>
 <span class="text-xs text-on-surface-variant">Exterior — Frente</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-frente">✓ Cargado</span>
 </label>
 <label class="photo-slot" data-slot="ext-izq">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-izq')"/>
-<span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
+<span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">directions_car</span>
 <span class="text-xs text-on-surface-variant">Exterior — Lado izq.</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-izq">✓ Cargado</span>
 </label>
 <label class="photo-slot" data-slot="ext-der">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-der')"/>
-<span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
+<span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">directions_car</span>
 <span class="text-xs text-on-surface-variant">Exterior — Lado der.</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-der">✓ Cargado</span>
 </label>
 <label class="photo-slot" data-slot="ext-trasera">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-trasera')"/>
-<span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
+<span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">directions_car</span>
 <span class="text-xs text-on-surface-variant">Exterior — Trasera</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-trasera">✓ Cargado</span>
 </label>
 </div>
 <p class="text-xs text-on-surface-variant">Entre más fotos agregues, más preciso será el cruce de información de tu análisis.</p>
@@ -287,20 +294,47 @@
 
     const TOTAL_FOTOS = 6;
     let fotosSubidas = 0;
+    const nombresSlots = {
+        'tablero': 'Tablero',
+        'niv': 'NIV / Placa',
+        'ext-frente': 'Exterior — Frente',
+        'ext-izq': 'Exterior — Lado izq.',
+        'ext-der': 'Exterior — Lado der.',
+        'ext-trasera': 'Exterior — Trasera'
+    };
+    let fotosCargadas = [];
+
     function fotoSubida(input, slot) {
         const label = input.closest('.photo-slot');
+        const icono = label.querySelector('.photo-icon');
+        const status = label.querySelector('.photo-status');
         if (input.files && input.files.length > 0) {
             if (!label.classList.contains('filled')) {
                 fotosSubidas++;
+                fotosCargadas.push(slot);
                 label.classList.add('filled');
+                icono.textContent = 'check_circle';
+                status.classList.remove('hidden');
             }
         } else if (label.classList.contains('filled')) {
             fotosSubidas--;
+            fotosCargadas = fotosCargadas.filter(s => s !== slot);
             label.classList.remove('filled');
+            icono.textContent = iconosOriginales[slot];
+            status.classList.add('hidden');
         }
         document.getElementById('foto-counter').textContent = fotosSubidas + '/' + TOTAL_FOTOS;
         actualizarChecks();
     }
+
+    const iconosOriginales = {
+        'tablero': 'speed',
+        'niv': 'qr_code_2',
+        'ext-frente': 'directions_car',
+        'ext-izq': 'directions_car',
+        'ext-der': 'directions_car',
+        'ext-trasera': 'directions_car'
+    };
 
     function marcarCheck(iconId, done) {
         const icon = document.getElementById(iconId);
