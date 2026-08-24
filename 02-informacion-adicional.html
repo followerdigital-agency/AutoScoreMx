@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Información adicional - AutoScoreMX</title>
+<meta name="robots" content="noindex"/>
+<link href="favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-surface": "#dbe5d9",
+                        "on-surface-variant": "#c7d6c6",
+                        "outline-variant": "#3b4a3d",
+                        "on-background": "#dbe5d9",
+                        "primary-container": "#00e678",
+                        "on-primary-fixed": "#00210c",
+                        "background": "#0d150e",
+                        "surface-container-lowest": "#081009",
+                        "surface-container-low": "#151e16",
+                        "surface-container": "#19221a",
+                        "surface-container-high": "#232c24",
+                        "bg-level-0": "#1A1A1A",
+                        "bg-level-1": "#2A2A2A",
+                        "border-level-1": "#3A3A3A",
+                        "warn": "#FFAB40"
+                    },
+                    fontFamily: { sans: ["Montserrat", "sans-serif"] }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .bg-level-0 { background-color: #1A1A1A; }
+        .bg-level-1 { background-color: #2A2A2A; border: 1px solid #3A3A3A; }
+        a:focus-visible, button:focus-visible, input:focus-visible {
+            outline: 2px solid #00e678; outline-offset: 2px; border-radius: 4px;
+        }
+        .toggle-btn {
+            padding: 12px 20px; border-radius: 10px; border: 1px solid #3A3A3A;
+            background: #19221a; color: #c7d6c6; font-weight: 700; cursor: pointer;
+            flex: 1; transition: all 0.15s ease; text-align: center;
+        }
+        .toggle-btn.selected { background: #00e678; border-color: #00e678; color: #003919; }
+        .photo-slot {
+            border: 1px dashed #3b4a3d; border-radius: 12px; background: #151e16;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 6px; padding: 16px 8px; text-align: center; cursor: pointer; transition: all 0.15s ease;
+            min-height: 110px;
+        }
+        .photo-slot:hover { border-color: #00e678; }
+        .photo-slot.filled { border-style: solid; border-color: #00e678; background: #152e20; }
+        .cat-pending { color: #6b7a6c; }
+        .cat-done { color: #00e678; }
+    </style>
+</head>
+<body class="bg-level-0 text-on-background font-sans min-h-screen flex flex-col">
+
+<nav class="bg-background border-b border-outline-variant">
+<div class="flex justify-between items-center w-full px-4 md:px-16 py-4 max-w-6xl mx-auto">
+<a href="index.html" class="flex items-center" aria-label="AutoScore, ir al inicio">
+<img src="logo.png" alt="AutoScore" class="h-8 w-auto"/>
+</a>
+<a href="#" class="text-on-surface-variant font-bold text-sm flex items-center gap-1.5 hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-lg" aria-hidden="true">help</span> ¿Necesitas ayuda?
+</a>
+</div>
+</nav>
+
+<main class="flex-grow px-4 md:px-16 py-8 md:py-12">
+<div class="max-w-6xl mx-auto w-full">
+
+<div class="mb-8">
+<div class="flex items-center gap-2 mb-3">
+<span class="text-primary-container font-bold text-sm">02 / 04</span>
+<span class="text-on-background font-bold text-sm">Información adicional</span>
+</div>
+<div class="flex gap-2 max-w-md">
+<div class="h-1 flex-1 rounded-full bg-primary-container"></div>
+<div class="h-1 flex-1 rounded-full bg-primary-container"></div>
+<div class="h-1 flex-1 rounded-full bg-border-level-1"></div>
+<div class="h-1 flex-1 rounded-full bg-border-level-1"></div>
+</div>
+</div>
+
+<!-- Resumen del vehículo -->
+<div class="bg-level-1 rounded-2xl p-5 flex items-center justify-between mb-8 max-w-3xl">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
+</div>
+<div>
+<h2 class="font-bold text-on-background">Audi A1 2018</h2>
+<p class="text-xs text-on-surface-variant uppercase tracking-wide">Agencia seminuevos</p>
+</div>
+</div>
+<a href="01-datos-auto.html" class="text-sm font-bold text-primary-container border border-outline-variant rounded-full px-4 py-2 hover:bg-surface-container-high transition-colors">Editar</a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 items-start">
+
+<div class="flex flex-col gap-8 max-w-3xl">
+<div>
+<h1 class="text-2xl md:text-3xl font-bold text-on-background mb-2">Ahora conozcamos mejor este auto.</h1>
+<p class="text-on-surface-variant">Agrega la información que tengas disponible para complementar el análisis. No necesitas tener todos los datos para continuar.</p>
+</div>
+
+<!-- Datos del vehículo -->
+<div class="bg-level-1 rounded-2xl p-6 flex flex-col gap-5">
+<p class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Datos del vehículo</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<label for="km" class="text-sm font-bold text-on-surface-variant">Kilometraje actual</label>
+<div class="relative">
+<input id="km" type="text" inputmode="numeric" placeholder="Ej. 65,000" oninput="actualizarChecks()" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 pr-12 text-on-background placeholder:text-on-surface-variant/50 w-full"/>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">km</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label for="precio" class="text-sm font-bold text-on-surface-variant">Precio de venta</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">$</span>
+<input id="precio" type="text" inputmode="numeric" placeholder="Ej. 215,000" oninput="actualizarChecks()" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 pl-7 pr-12 text-on-background placeholder:text-on-surface-variant/50 w-full"/>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">MXN</span>
+</div>
+<p class="text-xs text-on-surface-variant">El precio que te están pidiendo por el vehículo.</p>
+</div>
+</div>
+</div>
+
+<!-- Identificación: NIV principal, placas alternativa -->
+<div class="bg-level-1 rounded-2xl p-6 flex flex-col gap-5">
+<p class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Identificación del vehículo</p>
+<div class="flex flex-col gap-2">
+<span class="text-sm font-bold text-on-surface-variant">¿Tienes el NIV/VIN a la mano?</span>
+<div class="flex gap-3">
+<button type="button" id="btn-tiene-niv" onclick="mostrarNiv()" class="toggle-btn selected">Sí, tengo el NIV</button>
+<button type="button" id="btn-no-niv" onclick="mostrarPlacas()" class="toggle-btn">No, solo tengo placas</button>
+</div>
+</div>
+<div id="niv-field" class="flex flex-col gap-2">
+<label for="niv" class="text-sm font-bold text-on-surface-variant">NIV / VIN</label>
+<input id="niv" type="text" maxlength="17" placeholder="17 caracteres" oninput="actualizarChecks()" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/50 w-full uppercase"/>
+</div>
+<div id="placas-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<label for="placas" class="text-sm font-bold text-on-surface-variant">Placas</label>
+<input id="placas" type="text" placeholder="Ej. ABC-123-D" oninput="actualizarChecks()" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/50 w-full uppercase"/>
+</div>
+<div class="flex flex-col gap-2">
+<label for="estado" class="text-sm font-bold text-on-surface-variant">Estado de las placas</label>
+<select id="estado" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background w-full">
+<option value="">Selecciona un estado</option>
+<option>Ciudad de México</option>
+<option>Estado de México</option>
+<option>Jalisco</option>
+<option>Nuevo León</option>
+<option>Otro</option>
+</select>
+</div>
+<p class="text-xs text-on-surface-variant sm:col-span-2">Necesario para consultar el padrón de pólizas vigentes cuando no hay NIV disponible.</p>
+</div>
+</div>
+
+<!-- Fotos: máximo 5, con propósito específico -->
+<div class="bg-level-1 rounded-2xl p-6 flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<p class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Fotos del vehículo (opcional, máx. 6)</p>
+<span id="foto-counter" class="text-xs font-bold text-primary-container">0/6</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+<label class="photo-slot" data-slot="tablero">
+<input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'tablero')"/>
+<span class="material-symbols-outlined text-primary-container" aria-hidden="true">speed</span>
+<span class="text-xs text-on-surface-variant">Tablero</span>
+</label>
+<label class="photo-slot" data-slot="niv">
+<input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'niv')"/>
+<span class="material-symbols-outlined text-primary-container" aria-hidden="true">qr_code_2</span>
+<span class="text-xs text-on-surface-variant">NIV / Placa</span>
+</label>
+<label class="photo-slot" data-slot="ext-frente">
+<input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-frente')"/>
+<span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
+<span class="text-xs text-on-surface-variant">Exterior — Frente</span>
+</label>
+<label class="photo-slot" data-slot="ext-izq">
+<input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-izq')"/>
+<span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
+<span class="text-xs text-on-surface-variant">Exterior — Lado izq.</span>
+</label>
+<label class="photo-slot" data-slot="ext-der">
+<input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-der')"/>
+<span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
+<span class="text-xs text-on-surface-variant">Exterior — Lado der.</span>
+</label>
+<label class="photo-slot" data-slot="ext-trasera">
+<input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-trasera')"/>
+<span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
+<span class="text-xs text-on-surface-variant">Exterior — Trasera</span>
+</label>
+</div>
+<p class="text-xs text-on-surface-variant">Entre más fotos agregues, más preciso será el cruce de información de tu análisis.</p>
+</div>
+
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between text-sm">
+<span class="text-on-surface-variant">Información disponible</span>
+<span id="progreso-pct" class="font-bold text-primary-container">40%</span>
+</div>
+<div class="h-2 rounded-full bg-border-level-1 overflow-hidden">
+<div id="progreso-bar" class="h-full bg-primary-container transition-all" style="width:40%"></div>
+</div>
+</div>
+
+<div class="flex items-center justify-between">
+<a href="01-datos-auto.html" class="text-on-surface-variant font-bold flex items-center gap-1 hover:text-on-background transition-colors">
+<span class="material-symbols-outlined" aria-hidden="true">arrow_back</span> Volver
+</a>
+<a href="03-pago.html" class="bg-primary-container text-on-primary-fixed font-bold px-8 py-4 rounded-full hover:brightness-110 transition-all flex items-center gap-2">
+<span>Continuar</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+</a>
+</div>
+</div>
+
+<!-- Preview -->
+<div class="hidden lg:block bg-level-1 rounded-2xl p-6 sticky top-8">
+<div class="flex items-center justify-between mb-6">
+<span class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Información del vehículo</span>
+<span class="material-symbols-outlined text-primary-container" aria-hidden="true">bar_chart</span>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between bg-surface-container-low rounded-lg p-3">
+<span class="text-sm text-on-surface flex items-center gap-2"><span id="chk-basicos-icon" class="material-symbols-outlined cat-done text-lg" aria-hidden="true">check_circle</span> Datos básicos</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low rounded-lg p-3">
+<span class="text-sm text-on-surface flex items-center gap-2"><span id="chk-km-icon" class="material-symbols-outlined cat-pending text-lg" aria-hidden="true">radio_button_unchecked</span> Kilometraje</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low rounded-lg p-3">
+<span class="text-sm text-on-surface flex items-center gap-2"><span id="chk-precio-icon" class="material-symbols-outlined cat-pending text-lg" aria-hidden="true">radio_button_unchecked</span> Precio</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low rounded-lg p-3">
+<span class="text-sm text-on-surface flex items-center gap-2"><span id="chk-historial-icon" class="material-symbols-outlined cat-pending text-lg" aria-hidden="true">radio_button_unchecked</span> Historial</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low rounded-lg p-3">
+<span class="text-sm text-on-surface flex items-center gap-2"><span id="chk-identidad-icon" class="material-symbols-outlined cat-pending text-lg" aria-hidden="true">radio_button_unchecked</span> Identidad del vehículo</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low rounded-lg p-3">
+<span class="text-sm text-on-surface flex items-center gap-2"><span id="chk-imagenes-icon" class="material-symbols-outlined cat-pending text-lg" aria-hidden="true">radio_button_unchecked</span> Análisis de imágenes</span>
+</div>
+</div>
+<div class="mt-6 bg-surface-container-lowest rounded-lg p-4 flex gap-3">
+<span class="material-symbols-outlined text-warn text-lg" aria-hidden="true">info</span>
+<p class="text-xs text-on-surface-variant">Entre más datos proporciones, más preciso será el Score y el análisis de riesgo.</p>
+</div>
+</div>
+
+</div>
+</div>
+</main>
+
+<script>
+    function mostrarNiv() {
+        document.getElementById('btn-tiene-niv').classList.add('selected');
+        document.getElementById('btn-no-niv').classList.remove('selected');
+        document.getElementById('niv-field').classList.remove('hidden');
+        document.getElementById('placas-fields').classList.add('hidden');
+        actualizarChecks();
+    }
+    function mostrarPlacas() {
+        document.getElementById('btn-no-niv').classList.add('selected');
+        document.getElementById('btn-tiene-niv').classList.remove('selected');
+        document.getElementById('placas-fields').classList.remove('hidden');
+        document.getElementById('niv-field').classList.add('hidden');
+        actualizarChecks();
+    }
+
+    const TOTAL_FOTOS = 6;
+    let fotosSubidas = 0;
+    function fotoSubida(input, slot) {
+        const label = input.closest('.photo-slot');
+        if (input.files && input.files.length > 0) {
+            if (!label.classList.contains('filled')) {
+                fotosSubidas++;
+                label.classList.add('filled');
+            }
+        } else if (label.classList.contains('filled')) {
+            fotosSubidas--;
+            label.classList.remove('filled');
+        }
+        document.getElementById('foto-counter').textContent = fotosSubidas + '/' + TOTAL_FOTOS;
+        actualizarChecks();
+    }
+
+    function marcarCheck(iconId, done) {
+        const icon = document.getElementById(iconId);
+        if (done) {
+            icon.textContent = 'check_circle';
+            icon.classList.remove('cat-pending');
+            icon.classList.add('cat-done');
+        } else {
+            icon.textContent = 'radio_button_unchecked';
+            icon.classList.remove('cat-done');
+            icon.classList.add('cat-pending');
+        }
+    }
+
+    // Se ejecuta con cada cambio relevante del formulario: marca los bullets del panel
+    // derecho en tiempo real y recalcula el % de "información disponible".
+    function actualizarChecks() {
+        const km = document.getElementById('km').value.trim();
+        const precio = document.getElementById('precio').value.trim();
+        const tieneNiv = !document.getElementById('niv-field').classList.contains('hidden');
+        const niv = document.getElementById('niv').value.trim();
+        const placas = document.getElementById('placas').value.trim();
+        const estado = document.getElementById('estado').value.trim();
+
+        const identidadCompleta = tieneNiv ? niv.length > 0 : (placas.length > 0 && estado.length > 0);
+
+        marcarCheck('chk-km-icon', km.length > 0);
+        marcarCheck('chk-precio-icon', precio.length > 0);
+        marcarCheck('chk-historial-icon', identidadCompleta);
+        marcarCheck('chk-identidad-icon', identidadCompleta);
+        marcarCheck('chk-imagenes-icon', fotosSubidas > 0);
+
+        // Progreso general: 6 factores posibles (datos básicos siempre cuenta)
+        let completados = 1; // datos básicos (marca/modelo/año de la pantalla 01)
+        if (km.length > 0) completados++;
+        if (precio.length > 0) completados++;
+        if (identidadCompleta) completados += 2; // cuenta para Historial e Identidad
+        if (fotosSubidas > 0) completados++;
+        const pct = Math.round((completados / 6) * 100);
+        document.getElementById('progreso-pct').textContent = pct + '%';
+        document.getElementById('progreso-bar').style.width = pct + '%';
+    }
+
+    actualizarChecks();
+</script>
+</body>
+</html>
