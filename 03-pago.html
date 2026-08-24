@@ -134,7 +134,7 @@
 <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-sm">Historial (verificación de robo vía REPUVE/AMIS)</span></div>
 <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-sm">Identidad del vehículo</span></div>
 <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-sm">Precio de mercado</span></div>
-<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-sm">Análisis de imágenes (hasta 5 fotos)</span></div>
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-sm">Análisis de imágenes (hasta 6 fotos)</span></div>
 <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-sm">Inconsistencias y puntos a validar</span></div>
 </div>
 <p class="text-xs text-on-surface-variant mt-4 pt-4 border-t border-border-level-1">AutoScore no sustituye una inspección física o mecánica del vehículo.</p>
@@ -169,10 +169,11 @@
 </div>
 
 <div id="pay-card" class="flex flex-col gap-3">
-<input type="text" placeholder="Número de tarjeta" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/50 w-full"/>
+<input id="card-nombre" type="text" placeholder="Nombre del titular de la tarjeta" autocomplete="cc-name" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/50 w-full"/>
+<input id="card-numero" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="Número de tarjeta" maxlength="19" oninput="formatCardNumber(this)" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/50 w-full"/>
 <div class="grid grid-cols-2 gap-3">
-<input type="text" placeholder="MM/AA" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/50 w-full"/>
-<input type="text" placeholder="CVV" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/50 w-full"/>
+<input id="card-vencimiento" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5" oninput="formatVencimiento(this)" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/50 w-full"/>
+<input id="card-cvv" type="text" inputmode="numeric" autocomplete="cc-csc" placeholder="CVV" maxlength="3" oninput="soloDigitos(this)" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/50 w-full"/>
 </div>
 </div>
 <div id="pay-oxxo" class="hidden text-sm text-on-surface-variant bg-surface-container-lowest rounded-lg p-4">Generaremos una ficha de pago para pagar en cualquier tienda OXXO. Tu reporte inicia en cuanto se confirme el pago (24–48h adicionales).</div>
@@ -203,6 +204,27 @@
 </footer>
 
 <script>
+    // Solo dígitos, sin límite de longitud propio (lo controla maxlength del input)
+    function soloDigitos(input) {
+        input.value = input.value.replace(/[^0-9]/g, '');
+    }
+
+    // Número de tarjeta: máximo 16 dígitos numéricos, mostrados en grupos de 4 (formato "0000 0000 0000 0000")
+    function formatCardNumber(input) {
+        let digits = input.value.replace(/[^0-9]/g, '').slice(0, 16);
+        input.value = digits.replace(/(.{4})/g, '$1 ').trim();
+    }
+
+    // Vencimiento: máximo 4 dígitos numéricos, formateados automáticamente como "MM/AA"
+    function formatVencimiento(input) {
+        let digits = input.value.replace(/[^0-9]/g, '').slice(0, 4);
+        if (digits.length > 2) {
+            input.value = digits.slice(0, 2) + '/' + digits.slice(2);
+        } else {
+            input.value = digits;
+        }
+    }
+
     function setPayTab(btn) {
         document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
         btn.classList.add('active');
