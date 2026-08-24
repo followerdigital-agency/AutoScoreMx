@@ -38,6 +38,36 @@
         a:focus-visible, button:focus-visible { outline: 2px solid #00e678; outline-offset: 2px; border-radius: 4px; }
         @keyframes pulse-soft { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
         .pulse { animation: pulse-soft 2s ease-in-out infinite; }
+
+        /* Velocímetro "cargando": la aguja barre de un lado a otro sin parar */
+        @keyframes needleLoading {
+            0%   { transform: rotate(-75deg); }
+            50%  { transform: rotate(75deg); }
+            100% { transform: rotate(-75deg); }
+        }
+        .needle-loading {
+            animation: needleLoading 1.8s ease-in-out infinite;
+        }
+
+        /* Puntos suspensivos animados en "Analizando..." */
+        .loading-dots::after {
+            content: '';
+            animation: loadingDots 1.4s steps(4, end) infinite;
+        }
+        @keyframes loadingDots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-level-0 text-on-background font-sans min-h-screen flex flex-col">
@@ -47,7 +77,7 @@
 <a href="index.html" class="flex items-center" aria-label="AutoScore, ir al inicio">
 <img src="logo.png" alt="AutoScore" class="h-8 w-auto"/>
 </a>
-<a href="#" class="text-on-surface-variant font-bold text-sm flex items-center gap-1.5 hover:text-primary-container transition-colors">
+<a href="index.html#contacto" class="text-on-surface-variant font-bold text-sm flex items-center gap-1.5 hover:text-primary-container transition-colors">
 <span class="material-symbols-outlined text-lg" aria-hidden="true">help</span> ¿Necesitas ayuda?
 </a>
 </div>
@@ -56,9 +86,24 @@
 <main class="flex-grow flex items-center justify-center px-4 py-16">
 <div class="max-w-lg w-full flex flex-col items-center text-center gap-6">
 
-<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center pulse">
-<span class="material-symbols-outlined text-warn" style="font-size:2rem" aria-hidden="true">hourglass_top</span>
+<div class="relative w-full max-w-[200px]">
+<svg class="w-full overflow-visible" viewBox="0 0 200 110" role="img" aria-label="Analizando, velocímetro en movimiento">
+<defs>
+<linearGradient id="gaugeGradLoading" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" stop-color="#ff4d4d"></stop>
+<stop offset="50%" stop-color="#ffc107"></stop>
+<stop offset="100%" stop-color="#00e678"></stop>
+</linearGradient>
+</defs>
+<path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#333" stroke-linecap="round" stroke-width="14"></path>
+<path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGradLoading)" stroke-linecap="round" stroke-width="14" opacity="0.85"></path>
+<g class="needle-loading" style="transform-origin: 100px 100px;">
+<polygon fill="#fff" points="98,100 102,100 100,45"></polygon>
+<circle cx="100" cy="100" fill="#fff" r="6"></circle>
+</g>
+</svg>
 </div>
+<p class="text-primary-container font-bold text-sm uppercase tracking-widest loading-dots">Analizando</p>
 
 <span class="inline-flex items-center gap-2 border border-warn/40 text-warn font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full">
 <span class="w-1.5 h-1.5 rounded-full bg-warn" aria-hidden="true"></span> En preparación
