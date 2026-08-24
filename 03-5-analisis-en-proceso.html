@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Análisis en proceso - AutoScoreMX</title>
+<meta name="robots" content="noindex"/>
+<link href="favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-surface": "#dbe5d9", "on-surface-variant": "#c7d6c6",
+                        "outline-variant": "#3b4a3d", "on-background": "#dbe5d9",
+                        "primary-container": "#00e678", "on-primary-fixed": "#00210c",
+                        "background": "#0d150e", "surface-container-lowest": "#081009",
+                        "surface-container-low": "#151e16", "surface-container-high": "#232c24",
+                        "bg-level-0": "#1A1A1A", "bg-level-1": "#2A2A2A", "border-level-1": "#3A3A3A",
+                        "warn": "#FFAB40"
+                    },
+                    fontFamily: { sans: ["Montserrat", "sans-serif"] }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .bg-level-0 { background-color: #1A1A1A; }
+        .bg-level-1 { background-color: #2A2A2A; border: 1px solid #3A3A3A; }
+        a:focus-visible, button:focus-visible { outline: 2px solid #00e678; outline-offset: 2px; border-radius: 4px; }
+        @keyframes pulse-soft { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+        .pulse { animation: pulse-soft 2s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-level-0 text-on-background font-sans min-h-screen flex flex-col">
+
+<nav class="bg-background border-b border-outline-variant">
+<div class="flex justify-between items-center w-full px-4 md:px-16 py-4 max-w-6xl mx-auto">
+<a href="index.html" class="flex items-center" aria-label="AutoScore, ir al inicio">
+<img src="logo.png" alt="AutoScore" class="h-8 w-auto"/>
+</a>
+<a href="#" class="text-on-surface-variant font-bold text-sm flex items-center gap-1.5 hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-lg" aria-hidden="true">help</span> ¿Necesitas ayuda?
+</a>
+</div>
+</nav>
+
+<main class="flex-grow flex items-center justify-center px-4 py-16">
+<div class="max-w-lg w-full flex flex-col items-center text-center gap-6">
+
+<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center pulse">
+<span class="material-symbols-outlined text-warn" style="font-size:2rem" aria-hidden="true">hourglass_top</span>
+</div>
+
+<span class="inline-flex items-center gap-2 border border-warn/40 text-warn font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-warn" aria-hidden="true"></span> En preparación
+</span>
+
+<h1 class="text-3xl md:text-4xl font-bold text-on-background">Tu análisis se está preparando</h1>
+<p class="text-on-surface-variant">Recibirás tu reporte de <strong class="text-on-background">Audi A1 2018</strong> por correo en menos de 24 horas. Te avisamos en cuanto esté listo.</p>
+
+<div class="bg-level-1 rounded-2xl p-6 w-full flex flex-col gap-4 text-left">
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Número de reporte</span>
+<span class="font-bold text-on-background">AS-7K4P9X2M</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Pago confirmado</span>
+<span class="font-bold text-on-background">Hoy, 10:18 AM</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Correo de contacto</span>
+<span class="font-bold text-on-background">tu@correo.com</span>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest rounded-xl p-4 flex gap-3 text-left">
+<span class="material-symbols-outlined text-primary-container" aria-hidden="true">mark_email_read</span>
+<p class="text-sm text-on-surface-variant">Te enviamos un correo confirmando que tu reporte está en proceso. Cuando esté listo, te llegará un segundo correo con las instrucciones para verlo.</p>
+</div>
+
+<div class="flex flex-col sm:flex-row gap-3 w-full mt-2">
+<a href="index.html" class="flex-1 border border-outline-variant text-on-background font-bold px-6 py-3 rounded-full hover:bg-surface-container-high transition-colors text-center">Volver al inicio</a>
+<a href="consultar-reporte.html" class="flex-1 bg-primary-container text-on-primary-fixed font-bold px-6 py-3 rounded-full hover:brightness-110 transition-all text-center">Consultar mi reporte</a>
+</div>
+
+</div>
+</main>
+
+<footer class="border-t border-outline-variant py-6 px-4 md:px-16">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-on-surface-variant">
+<p>© 2026 AutoScoreMX. Todos los derechos reservados.</p>
+<div class="flex gap-4">
+<a href="#" class="hover:text-primary-container">Términos y Condiciones</a>
+<a href="privacidad.html" class="hover:text-primary-container">Aviso de Privacidad</a>
+<a href="#" class="hover:text-primary-container">Soporte</a>
+</div>
+</div>
+</footer>
+</body>
+</html>
