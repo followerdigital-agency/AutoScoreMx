@@ -246,9 +246,9 @@
 </div>
 <!-- Acciones -->
 <div class="flex items-center gap-4">
-<button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="bg-primary-container text-on-primary-fixed font-label-bold px-6 py-2.5 rounded-full hover:bg-primary transition-colors glow-primary-hover flex items-center gap-2">
+<a href="01-datos-auto.html" class="bg-primary-container text-on-primary-fixed font-label-bold px-6 py-2.5 rounded-full hover:bg-primary transition-colors glow-primary-hover flex items-center gap-2">
                     Analizar mi auto
-                </button>
+                </a>
 <button id="mobile-menu-toggle" class="md:hidden text-on-background" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="mobile-menu">
 <span class="material-symbols-outlined" aria-hidden="true">menu</span>
 </button>
@@ -260,7 +260,7 @@
 <a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="#que-analizamos">Qué analizamos</a>
 <a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="#precio">Precio</a>
 <a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="#preguntas">Preguntas</a>
-<a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="#reporte">Consultar mi reporte</a>
+<a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="consultar-reporte.html">Consultar mi reporte</a>
 </div>
 </nav>
 
@@ -281,11 +281,11 @@ Conoce el <span class="text-primary-container">riesgo</span> antes de entregar t
 Analizamos la información disponible del vehículo, detectamos inconsistencias y te ayudamos a tomar una mejor decisión de compra.
 </p>
 <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 mt-4">
-<button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="bg-primary-container text-on-primary-fixed font-label-bold px-6 sm:px-8 py-4 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg whitespace-nowrap w-full sm:w-auto">
+<a href="01-datos-auto.html" class="bg-primary-container text-on-primary-fixed font-label-bold px-6 sm:px-8 py-4 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg whitespace-nowrap w-full sm:w-auto">
 <span>Analizar mi auto</span> <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span>
-</button>
-<a href="#ejemplo-reporte" class="border border-outline-variant text-on-background font-label-bold px-6 sm:px-8 py-4 rounded-full hover:bg-surface-variant transition-all flex items-center justify-center gap-2 text-body-lg whitespace-nowrap w-full sm:w-auto">
-Ver reporte de ejemplo
+</a>
+<a href="consultar-reporte.html" class="border border-outline-variant text-on-background font-label-bold px-6 sm:px-8 py-4 rounded-full hover:bg-surface-variant transition-all flex items-center justify-center gap-2 text-body-lg whitespace-nowrap w-full sm:w-auto">
+Consultar mi reporte
 </a>
 </div>
 <img src="logo.png" alt="AutoScore" width="224" height="139" class="hidden md:block h-auto w-56 mt-6 opacity-95"/>
@@ -481,9 +481,9 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 <div class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-surface-variant text-label-sm font-label-sm w-full">
                             Marca, modelo y año
                         </div>
-<button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="w-full bg-primary-container text-on-primary-fixed py-2.5 rounded-full font-label-bold flex items-center justify-center gap-2">
+<a href="01-datos-auto.html" class="w-full bg-primary-container text-on-primary-fixed py-2.5 rounded-full font-label-bold flex items-center justify-center gap-2">
                             Continuar <span class="material-symbols-outlined text-sm" aria-hidden="true">arrow_forward</span>
-</button>
+</a>
 </div>
 <div class="absolute inset-0 bg-gradient-to-b from-transparent to-surface-container-lowest/50 pointer-events-none" aria-hidden="true"></div>
 </div>
@@ -556,61 +556,9 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 </div>
 </section>
 
-<!-- Formulario de análisis (front-end funcional, consistente con Pantalla 01 de la app: marca/modelo/año + lugar de compra) -->
-<section class="bg-level-0 py-14 md:py-32 px-margin-mobile md:px-margin-desktop" id="analizar">
-<div class="max-w-2xl mx-auto w-full flex flex-col gap-8">
-<div class="flex flex-col items-center text-center gap-3">
-<span class="text-primary-container font-label-bold tracking-widest uppercase">Comencemos</span>
-<h2 class="text-headline-lg font-headline-lg text-on-background">¿Qué auto estás pensando comprar?</h2>
-<p class="text-body-md text-on-surface-variant max-w-lg">Cuéntanos lo básico del vehículo que estás considerando y comenzaremos a preparar tu análisis.</p>
-</div>
-<form id="analisis-form" class="bg-[#2A2A2A] border border-outline-variant rounded-2xl p-6 md:p-8 flex flex-col gap-6" novalidate="" onsubmit="return handleAnalisisSubmit(event)">
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div class="flex flex-col gap-2">
-<label for="marca-input" class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">Marca</label>
-<input id="marca-input" name="marca" type="text" required="" placeholder="Ej. Audi" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/60 w-full"/>
-</div>
-<div class="flex flex-col gap-2">
-<label for="modelo-input" class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">Modelo</label>
-<input id="modelo-input" name="modelo" type="text" required="" placeholder="Ej. A1" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/60 w-full"/>
-</div>
-<div class="flex flex-col gap-2">
-<label for="anio-input" class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">Año</label>
-<input id="anio-input" name="anio" type="number" inputmode="numeric" required="" placeholder="Ej. 2018" min="1980" max="2027" class="bg-surface-container-high border border-outline-variant rounded-lg p-3 text-on-background placeholder:text-on-surface-variant/60 w-full"/>
-</div>
-</div>
-<div class="flex flex-col gap-3">
-<span class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wide text-[12px]">Lugar de compra</span>
-<div id="lugar-compra-group" class="flex flex-wrap gap-2" role="radiogroup" aria-label="Lugar de compra">
-<button type="button" class="lugar-chip" data-value="Agencia seminuevos" role="radio" aria-checked="false">Agencia seminuevos</button>
-<button type="button" class="lugar-chip" data-value="Lote de autos" role="radio" aria-checked="false">Lote de autos</button>
-<button type="button" class="lugar-chip" data-value="Venta directa" role="radio" aria-checked="false">Venta directa</button>
-<button type="button" class="lugar-chip" data-value="Marketplace" role="radio" aria-checked="false">Marketplace</button>
-<button type="button" class="lugar-chip" data-value="Kavak" role="radio" aria-checked="false">Kavak</button>
-<button type="button" class="lugar-chip" data-value="Mercado Libre" role="radio" aria-checked="false">Mercado Libre</button>
-<button type="button" class="lugar-chip" data-value="Otro" role="radio" aria-checked="false">Otro</button>
-</div>
-<p id="lugar-error" class="hidden text-label-sm" style="color:#FF5252">Selecciona dónde estás comprando el auto.</p>
-</div>
-<p class="text-label-sm text-on-surface-variant">Al continuar aceptas nuestro <a href="privacidad.html" class="text-primary-container hover:text-primary underline">aviso de privacidad</a>. Tu información se usa solo para preparar tu análisis.</p>
-<button type="submit" class="w-full bg-primary-container text-on-primary-fixed font-label-bold py-4 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg">
-<span>Continuar</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-</button>
-</form>
-<div id="form-confirmacion" class="hidden bg-[#152e20] border border-primary-container/30 rounded-2xl p-8 text-center flex flex-col items-center gap-3">
-<span class="material-symbols-outlined text-primary-container" style="font-size:2.5rem" aria-hidden="true">check_circle</span>
-<p class="text-headline-md font-headline-md text-on-background">¡Listo! (vista previa de front-end)</p>
-<p class="text-body-md text-on-surface-variant max-w-md">Aquí seguiría el Paso 02 (información adicional) y el Paso 03 (pago) del flujo real.</p>
-</div>
-<div class="flex items-center justify-center gap-2 text-on-surface-variant">
-<span class="material-symbols-outlined text-sm" aria-hidden="true">lock</span>
-<span class="text-label-sm">Tu información se utiliza únicamente para preparar el análisis solicitado.</span>
-</div>
-<div class="flex justify-center">
-<span class="material-symbols-outlined text-primary-container animate-bounce" aria-hidden="true">arrow_downward</span>
-</div>
-</div>
-</section>
+<!-- La sección "Empieza aquí" embebida se removió: ahora "Analizar mi auto" lleva
+     directamente a la Pantalla 01 dedicada (01-datos-auto.html) en vez de duplicar
+     el mismo formulario dentro de la landing. -->
 
 <!-- Pricing Section -->
 <section class="bg-surface-container-lowest py-14 md:py-32 px-margin-mobile md:px-margin-desktop relative" id="precio">
@@ -641,9 +589,9 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 <div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Recomendaciones</span></div>
 <div class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span><span class="text-body-md whitespace-nowrap">Checklist de puntos a validar</span></div>
 </div>
-<button onclick="document.getElementById('analizar').scrollIntoView({behavior:'smooth'})" class="w-full bg-primary-container text-on-primary-fixed font-label-bold py-5 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg whitespace-nowrap">
+<a href="01-datos-auto.html" class="w-full bg-primary-container text-on-primary-fixed font-label-bold py-5 rounded-full hover:bg-primary transition-all glow-primary-hover flex items-center justify-center gap-2 text-body-lg whitespace-nowrap">
 <span>Analizar mi auto</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-</button>
+</a>
 <div class="flex items-center justify-center gap-2 mt-4 text-on-surface-variant">
 <span class="material-symbols-outlined text-sm" aria-hidden="true">lock</span>
 <span class="text-label-sm">Pago seguro</span>
@@ -761,7 +709,7 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 <h3 class="text-headline-md font-headline-md text-on-background">¿Ya analizaste un auto?</h3>
 <p class="text-body-md text-on-surface-variant">Consulta nuevamente tu reporte sin crear una cuenta.</p>
 </div>
-<a class="text-primary-container font-label-bold hover:text-primary transition-colors flex items-center gap-2 text-body-lg" href="#">
+<a class="text-primary-container font-label-bold hover:text-primary transition-colors flex items-center gap-2 text-body-lg" href="consultar-reporte.html">
       Consultar mi reporte <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
 </a>
 </div>
@@ -804,41 +752,6 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
             menuToggle.querySelector('.material-symbols-outlined').textContent = 'menu';
         });
     });
-
-    // Chips de "Lugar de compra" (selección única tipo radio)
-    let lugarSeleccionado = '';
-    const lugarChips = document.querySelectorAll('.lugar-chip');
-    lugarChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            lugarChips.forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-checked', 'false'); });
-            chip.classList.add('selected');
-            chip.setAttribute('aria-checked', 'true');
-            lugarSeleccionado = chip.dataset.value;
-            document.getElementById('lugar-error').classList.add('hidden');
-        });
-    });
-
-    // Validación del formulario de análisis (front-end únicamente)
-    function handleAnalisisSubmit(event) {
-        event.preventDefault();
-        const marca = document.getElementById('marca-input').value.trim();
-        const modelo = document.getElementById('modelo-input').value.trim();
-        const anio = document.getElementById('anio-input').value.trim();
-        const lugarError = document.getElementById('lugar-error');
-
-        if (!lugarSeleccionado) {
-            lugarError.classList.remove('hidden');
-            document.getElementById('lugar-compra-group').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return false;
-        }
-        if (!marca || !modelo || !anio) {
-            return false;
-        }
-
-        document.getElementById('analisis-form').classList.add('hidden');
-        document.getElementById('form-confirmacion').classList.remove('hidden');
-        return false;
-    }
 </script>
 </body>
 </html>
