@@ -59,7 +59,7 @@
 <div class="max-w-md w-full bg-level-1 rounded-2xl p-8 flex flex-col items-center text-center gap-5">
 <span class="material-symbols-outlined text-primary-container" style="font-size:2.5rem" aria-hidden="true">mark_email_unread</span>
 <h1 class="text-2xl font-bold text-on-background">Verifica tu correo</h1>
-<p class="text-on-surface-variant">Enviamos un código de acceso de un solo uso a <strong class="text-on-background">t***@correo.com</strong>.</p>
+<p class="text-on-surface-variant">Enviamos un código de acceso de un solo uso a <strong id="correo-enmascarado" class="text-on-background">tu correo</strong>.</p>
 
 <form onsubmit="return handleVerificar(event)" class="w-full flex flex-col gap-6">
 <div class="grid grid-cols-6 gap-2" onpaste="handlePaste(event)">
@@ -88,12 +88,21 @@
 <div class="flex gap-4">
 <a href="terminos.html" class="hover:text-primary-container">Términos y Condiciones</a>
 <a href="privacidad.html" class="hover:text-primary-container">Aviso de Privacidad</a>
-<a href="#" class="hover:text-primary-container">Soporte</a>
+<a href="index.html#contacto" class="hover:text-primary-container">Contacto y soporte</a>
 </div>
 </div>
 </footer>
 
 <script>
+    // Enmascara el correo guardado por consultar-reporte.html: primer carácter + *** + dominio completo.
+    (function mostrarCorreoEnmascarado() {
+        const correo = sessionStorage.getItem('as_correo');
+        if (!correo || !correo.includes('@')) return;
+        const [usuario, dominio] = correo.split('@');
+        const enmascarado = usuario.charAt(0) + '***@' + dominio;
+        document.getElementById('correo-enmascarado').textContent = enmascarado;
+    })();
+
     function autoAdvance(input) {
         input.value = input.value.replace(/[^0-9]/g, '');
         if (input.value.length === 1 && input.nextElementSibling) {

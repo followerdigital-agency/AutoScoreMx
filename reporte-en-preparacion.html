@@ -56,16 +56,16 @@
 <main class="flex-grow flex items-center justify-center px-4 py-16">
 <div class="max-w-lg w-full flex flex-col items-center text-center gap-6">
 
-<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center pulse">
-<span class="material-symbols-outlined text-warn" style="font-size:2rem" aria-hidden="true">hourglass_top</span>
+<div id="estado-circulo" class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center pulse">
+<span id="estado-icono" class="material-symbols-outlined text-warn" style="font-size:2rem" aria-hidden="true">hourglass_top</span>
 </div>
 
-<span class="inline-flex items-center gap-2 border border-warn/40 text-warn font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full">
-<span class="w-1.5 h-1.5 rounded-full bg-warn" aria-hidden="true"></span> En preparación
+<span id="estado-badge" class="inline-flex items-center gap-2 border border-warn/40 text-warn font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full">
+<span id="estado-badge-dot" class="w-1.5 h-1.5 rounded-full bg-warn" aria-hidden="true"></span> <span id="estado-badge-texto">En preparación</span>
 </span>
 
-<h1 class="text-3xl font-bold text-on-background">Tu análisis se está preparando</h1>
-<p class="text-on-surface-variant">Este reporte todavía no está listo. Nuestro equipo lo está armando a mano para asegurar la calidad del análisis.</p>
+<h1 id="estado-titulo" class="text-3xl font-bold text-on-background">Tu análisis se está preparando</h1>
+<p id="estado-descripcion" class="text-on-surface-variant">Este reporte todavía no está listo. Nuestro equipo lo está armando a mano para asegurar la calidad del análisis.</p>
 
 <div class="bg-level-1 rounded-2xl p-6 w-full flex flex-col gap-4 text-left">
 <div class="flex items-center gap-3 pb-4 border-b border-border-level-1">
@@ -82,14 +82,14 @@
 <span class="font-bold text-on-background">Hoy, 10:18 AM</span>
 </div>
 <div class="flex justify-between text-sm">
-<span class="text-on-surface-variant">Tiempo estimado de entrega</span>
-<span class="font-bold text-on-background">Menos de 24 horas</span>
+<span id="estado-fila-label" class="text-on-surface-variant">Tiempo estimado de entrega</span>
+<span id="estado-fila-valor" class="font-bold text-on-background">Menos de 24 horas</span>
 </div>
 </div>
 
-<div class="bg-surface-container-lowest rounded-xl p-4 flex gap-3 text-left w-full">
+<div id="estado-nota" class="bg-surface-container-lowest rounded-xl p-4 flex gap-3 text-left w-full">
 <span class="material-symbols-outlined text-primary-container" aria-hidden="true">mark_email_read</span>
-<p class="text-sm text-on-surface-variant">Te avisaremos por correo en cuanto tu reporte esté listo. También puedes volver a consultarlo aquí más tarde con el mismo correo.</p>
+<p id="estado-nota-texto" class="text-sm text-on-surface-variant">Te avisaremos por correo en cuanto tu reporte esté listo. También puedes volver a consultarlo aquí más tarde con el mismo correo.</p>
 </div>
 
 <a href="index.html" class="text-on-surface-variant font-bold flex items-center gap-1 hover:text-on-background transition-colors">
@@ -105,9 +105,55 @@
 <div class="flex gap-4">
 <a href="terminos.html" class="hover:text-primary-container">Términos y Condiciones</a>
 <a href="privacidad.html" class="hover:text-primary-container">Aviso de Privacidad</a>
-<a href="#" class="hover:text-primary-container">Soporte</a>
+<a href="index.html#contacto" class="hover:text-primary-container">Contacto y soporte</a>
 </div>
 </div>
 </footer>
+
+<script>
+    // Reutiliza esta misma pantalla para los estados "pendiente/procesando", "no_concluyente"
+    // y "reembolsado" del enum `status` de la tabla `reports`. La Fase B pasará el status real
+    // (por ahora se puede probar con ?status=no_concluyente o ?status=reembolsado en la URL).
+    const VARIANTES = {
+        preparacion: {
+            icono: 'hourglass_top', colorClase: 'text-warn', borderClase: 'border-warn/40', dotClase: 'bg-warn',
+            badge: 'En preparación', titulo: 'Tu análisis se está preparando',
+            descripcion: 'Este reporte todavía no está listo. Nuestro equipo lo está armando a mano para asegurar la calidad del análisis.',
+            filaLabel: 'Tiempo estimado de entrega', filaValor: 'Menos de 24 horas',
+            notaTexto: 'Te avisaremos por correo en cuanto tu reporte esté listo. También puedes volver a consultarlo aquí más tarde con el mismo correo.'
+        },
+        no_concluyente: {
+            icono: 'info', colorClase: 'text-on-surface-variant', borderClase: 'border-outline-variant', dotClase: 'bg-on-surface-variant',
+            badge: 'No concluyente', titulo: 'No pudimos concluir tu análisis',
+            descripcion: 'La información disponible de este vehículo no fue suficiente para completar un análisis útil.',
+            filaLabel: 'Estado', filaValor: 'En revisión por nuestro equipo',
+            notaTexto: 'Nos pondremos en contacto contigo por correo para resolver tu caso, lo cual puede incluir un reembolso total o parcial.'
+        },
+        reembolsado: {
+            icono: 'account_balance_wallet', colorClase: 'text-on-surface-variant', borderClase: 'border-outline-variant', dotClase: 'bg-on-surface-variant',
+            badge: 'Reembolsado', titulo: 'Tu compra fue reembolsada',
+            descripcion: 'Procesamos el reembolso de tu compra para este análisis.',
+            filaLabel: 'Reembolso', filaValor: 'Procesado',
+            notaTexto: 'Si tienes dudas sobre tu reembolso, contáctanos por WhatsApp o correo.'
+        }
+    };
+
+    const status = new URLSearchParams(window.location.search).get('status') || 'preparacion';
+    const variante = VARIANTES[status] || VARIANTES.preparacion;
+
+    document.getElementById('estado-icono').textContent = variante.icono;
+    document.getElementById('estado-icono').className = 'material-symbols-outlined ' + variante.colorClase;
+    document.getElementById('estado-badge').className = 'inline-flex items-center gap-2 border ' + variante.borderClase + ' ' + variante.colorClase + ' font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full';
+    document.getElementById('estado-badge-dot').className = 'w-1.5 h-1.5 rounded-full ' + variante.dotClase;
+    document.getElementById('estado-badge-texto').textContent = variante.badge;
+    document.getElementById('estado-titulo').textContent = variante.titulo;
+    document.getElementById('estado-descripcion').textContent = variante.descripcion;
+    document.getElementById('estado-fila-label').textContent = variante.filaLabel;
+    document.getElementById('estado-fila-valor').textContent = variante.filaValor;
+    document.getElementById('estado-nota-texto').textContent = variante.notaTexto;
+    if (status !== 'preparacion') {
+        document.getElementById('estado-circulo').classList.remove('pulse');
+    }
+</script>
 </body>
 </html>
