@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -73,13 +74,13 @@
 <span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
 </div>
 <div>
-<h2 class="font-bold text-on-background">Audi A1 2018</h2>
-<p class="text-xs text-on-surface-variant uppercase tracking-wide">Reporte AS-7K4P9X2M</p>
+<h2 id="vehiculo-titulo" class="font-bold text-on-background">Audi A1 2018</h2>
+<p class="text-xs text-on-surface-variant uppercase tracking-wide">Reporte <span id="reporte-numero-texto">AS-7K4P9X2M</span></p>
 </div>
 </div>
 <div class="flex justify-between text-sm">
 <span class="text-on-surface-variant">Pago confirmado</span>
-<span class="font-bold text-on-background">Hoy, 10:18 AM</span>
+<span id="pago-fecha-texto" class="font-bold text-on-background">Hoy, 10:18 AM</span>
 </div>
 <div class="flex justify-between text-sm">
 <span id="estado-fila-label" class="text-on-surface-variant">Tiempo estimado de entrega</span>
@@ -111,9 +112,13 @@
 </footer>
 
 <script>
+    const sb = window.supabase.createClient(
+        'https://nnlxcelrbkreffxotezo.supabase.co',
+        'sb_publishable_WRLtbtqL5VDKbUhY-tzGEw_SkEbne5j'
+    );
+
     // Reutiliza esta misma pantalla para los estados "pendiente/procesando", "no_concluyente"
-    // y "reembolsado" del enum `status` de la tabla `reports`. La Fase B pasará el status real
-    // (por ahora se puede probar con ?status=no_concluyente o ?status=reembolsado en la URL).
+    // y "reembolsado" del enum `status` de la tabla `reports`.
     const VARIANTES = {
         preparacion: {
             icono: 'hourglass_top', colorClase: 'text-warn', borderClase: 'border-warn/40', dotClase: 'bg-warn',
@@ -138,22 +143,75 @@
         }
     };
 
-    const status = new URLSearchParams(window.location.search).get('status') || 'preparacion';
-    const variante = VARIANTES[status] || VARIANTES.preparacion;
+    // pendiente/procesando (valores reales del enum) comparten la variante "preparacion".
+    const STATUS_A_VARIANTE = {
+        pendiente: 'preparacion', procesando: 'preparacion',
+        preparacion: 'preparacion', no_concluyente: 'no_concluyente', reembolsado: 'reembolsado'
+    };
 
-    document.getElementById('estado-icono').textContent = variante.icono;
-    document.getElementById('estado-icono').className = 'material-symbols-outlined ' + variante.colorClase;
-    document.getElementById('estado-badge').className = 'inline-flex items-center gap-2 border ' + variante.borderClase + ' ' + variante.colorClase + ' font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full';
-    document.getElementById('estado-badge-dot').className = 'w-1.5 h-1.5 rounded-full ' + variante.dotClase;
-    document.getElementById('estado-badge-texto').textContent = variante.badge;
-    document.getElementById('estado-titulo').textContent = variante.titulo;
-    document.getElementById('estado-descripcion').textContent = variante.descripcion;
-    document.getElementById('estado-fila-label').textContent = variante.filaLabel;
-    document.getElementById('estado-fila-valor').textContent = variante.filaValor;
-    document.getElementById('estado-nota-texto').textContent = variante.notaTexto;
-    if (status !== 'preparacion') {
-        document.getElementById('estado-circulo').classList.remove('pulse');
+    function aplicarVariante(rawStatus) {
+        const key = STATUS_A_VARIANTE[rawStatus] || 'preparacion';
+        const variante = VARIANTES[key];
+        document.getElementById('estado-icono').textContent = variante.icono;
+        document.getElementById('estado-icono').className = 'material-symbols-outlined ' + variante.colorClase;
+        document.getElementById('estado-badge').className = 'inline-flex items-center gap-2 border ' + variante.borderClase + ' ' + variante.colorClase + ' font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full';
+        document.getElementById('estado-badge-dot').className = 'w-1.5 h-1.5 rounded-full ' + variante.dotClase;
+        document.getElementById('estado-badge-texto').textContent = variante.badge;
+        document.getElementById('estado-titulo').textContent = variante.titulo;
+        document.getElementById('estado-descripcion').textContent = variante.descripcion;
+        document.getElementById('estado-fila-label').textContent = variante.filaLabel;
+        document.getElementById('estado-fila-valor').textContent = variante.filaValor;
+        document.getElementById('estado-nota-texto').textContent = variante.notaTexto;
+        if (key !== 'preparacion') {
+            document.getElementById('estado-circulo').classList.remove('pulse');
+        }
     }
+
+    const STATUS_EXCLUIDOS = ['borrador', 'pendiente_pago'];
+
+    (async function cargar() {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+            window.location.href = 'consultar-reporte.html';
+            return;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        let reportId = params.get('id');
+        let rawStatus = params.get('status');
+
+        let query = sb.from('reports')
+            .select('id, status, paid_at, vehicles ( marca, modelo, anio )');
+
+        if (reportId) {
+            query = query.eq('id', reportId);
+        } else {
+            // Sin id en la URL (recarga, link guardado): tomamos el reporte más reciente del usuario.
+            query = query.not('status', 'in', '(' + STATUS_EXCLUIDOS.join(',') + ')')
+                .order('created_at', { ascending: false });
+        }
+
+        const { data, error } = await query.limit(1);
+        if (error || !data || data.length === 0) {
+            window.location.href = 'consultar-reporte.html';
+            return;
+        }
+
+        const reporte = data[0];
+        reportId = reporte.id;
+        rawStatus = reporte.status;
+
+        aplicarVariante(rawStatus);
+        document.getElementById('reporte-numero-texto').textContent = reportId;
+        if (reporte.vehicles) {
+            document.getElementById('vehiculo-titulo').textContent =
+                [reporte.vehicles.marca, reporte.vehicles.modelo, reporte.vehicles.anio].filter(Boolean).join(' ');
+        }
+        if (reporte.paid_at) {
+            document.getElementById('pago-fecha-texto').textContent =
+                new Date(reporte.paid_at).toLocaleString('es-MX', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+        }
+    })();
 </script>
 </body>
 </html>

@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -70,8 +71,9 @@
 <input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvance(this)" required=""/>
 <input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvance(this)" required=""/>
 </div>
-<button type="submit" class="w-full bg-primary-container text-on-primary-fixed font-bold py-3.5 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2">
-<span>Continuar</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+<p id="otp-error" class="hidden text-sm text-left" style="color:#FF5252">Código incorrecto o expirado. Inténtalo de nuevo.</p>
+<button id="btn-verificar" type="submit" class="w-full bg-primary-container text-on-primary-fixed font-bold py-3.5 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+<span id="btn-verificar-texto">Continuar</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
 </button>
 </form>
 
@@ -94,11 +96,21 @@
 </footer>
 
 <script>
+    const sb = window.supabase.createClient(
+        'https://nnlxcelrbkreffxotezo.supabase.co',
+        'sb_publishable_WRLtbtqL5VDKbUhY-tzGEw_SkEbne5j'
+    );
+
+    const correoGuardado = sessionStorage.getItem('as_correo');
+    if (!correoGuardado) {
+        // Nadie llega aquí sin haber pasado por consultar-reporte.html primero.
+        window.location.href = 'consultar-reporte.html';
+    }
+
     // Enmascara el correo guardado por consultar-reporte.html: primer carácter + *** + dominio completo.
     (function mostrarCorreoEnmascarado() {
-        const correo = sessionStorage.getItem('as_correo');
-        if (!correo || !correo.includes('@')) return;
-        const [usuario, dominio] = correo.split('@');
+        if (!correoGuardado || !correoGuardado.includes('@')) return;
+        const [usuario, dominio] = correoGuardado.split('@');
         const enmascarado = usuario.charAt(0) + '***@' + dominio;
         document.getElementById('correo-enmascarado').textContent = enmascarado;
     })();
@@ -115,11 +127,55 @@
         text.split('').slice(0, 6).forEach((char, i) => { if (boxes[i]) boxes[i].value = char; });
         event.preventDefault();
     }
-    function handleVerificar(event) {
+
+    // Estos 2 status nunca deben mandar a un usuario a "en preparación": son carritos que
+    // nunca se pagaron, no reportes en curso.
+    const STATUS_EXCLUIDOS = ['borrador', 'pendiente_pago'];
+
+    async function handleVerificar(event) {
         event.preventDefault();
-        // Prototipo estático: no hay backend real para validar el código.
-        // Por defecto navega al estado "reporte encontrado" (completado).
-        window.location.href = 'reporte-encontrado.html';
+        const boxes = document.querySelectorAll('.otp-box');
+        const token = Array.from(boxes).map(b => b.value).join('');
+        const errorMsg = document.getElementById('otp-error');
+        errorMsg.classList.add('hidden');
+
+        if (token.length !== 6 || !correoGuardado) return false;
+
+        const boton = document.getElementById('btn-verificar');
+        boton.disabled = true;
+        document.getElementById('btn-verificar-texto').textContent = 'Verificando...';
+
+        const { error: verifyError } = await sb.auth.verifyOtp({
+            email: correoGuardado, token, type: 'email'
+        });
+
+        if (verifyError) {
+            boton.disabled = false;
+            document.getElementById('btn-verificar-texto').textContent = 'Continuar';
+            errorMsg.textContent = 'Código incorrecto o expirado. Inténtalo de nuevo.';
+            errorMsg.classList.remove('hidden');
+            return false;
+        }
+
+        const { data: reportes, error: queryError } = await sb
+            .from('reports')
+            .select('id, status')
+            .eq('email', correoGuardado)
+            .not('status', 'in', '(' + STATUS_EXCLUIDOS.join(',') + ')')
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+        if (queryError || !reportes || reportes.length === 0) {
+            window.location.href = 'consultar-reporte.html?sin_reportes=1';
+            return false;
+        }
+
+        const reporte = reportes[0];
+        if (reporte.status === 'completado') {
+            window.location.href = 'reporte-encontrado.html?id=' + encodeURIComponent(reporte.id);
+        } else {
+            window.location.href = 'reporte-en-preparacion.html?id=' + encodeURIComponent(reporte.id) + '&status=' + encodeURIComponent(reporte.status);
+        }
         return false;
     }
 
@@ -137,11 +193,14 @@
             reenviarBtn.classList.remove('opacity-50', 'pointer-events-none');
         }
     }, 1000);
-    function reenviarCodigo() {
+    async function reenviarCodigo() {
         segundos = 30;
         reenviarBtn.disabled = true;
         reenviarBtn.classList.add('opacity-50', 'pointer-events-none');
         document.getElementById('reenviar-nota').classList.remove('hidden');
+        if (correoGuardado) {
+            await sb.auth.signInWithOtp({ email: correoGuardado });
+        }
     }
 </script>
 </body>

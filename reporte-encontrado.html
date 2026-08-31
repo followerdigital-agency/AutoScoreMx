@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -58,7 +59,7 @@
 <span class="material-symbols-outlined text-base" aria-hidden="true">check_circle</span> Búsqueda exitosa
 </span>
 <h1 class="text-3xl md:text-4xl font-bold text-on-background">Reporte encontrado</h1>
-<p class="text-on-surface-variant">Reporte AS-7K4P9X2M generado el 23 Ago 2026</p>
+<p id="reporte-fecha-texto" class="text-on-surface-variant">Reporte AS-7K4P9X2M generado el 23 Ago 2026</p>
 
 <div class="bg-level-1 rounded-2xl p-6 flex items-center justify-between">
 <div class="flex items-center gap-3">
@@ -66,19 +67,19 @@
 <span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
 </div>
 <div>
-<h2 class="font-bold text-on-background">Audi A1 2018</h2>
-<p class="text-xs text-on-surface-variant">65,000 km · $215,000 MXN</p>
+<h2 id="vehiculo-titulo" class="font-bold text-on-background">Audi A1 2018</h2>
+<p id="vehiculo-detalle" class="text-xs text-on-surface-variant">65,000 km · $215,000 MXN</p>
 </div>
 </div>
 </div>
 
 <div class="grid grid-cols-2 gap-4 bg-level-1 rounded-2xl p-6 text-sm">
-<div><p class="text-on-surface-variant">NIV / VIN</p><p class="font-bold text-on-background">WAUZZZ8X...</p></div>
-<div><p class="text-on-surface-variant">Placas</p><p class="font-bold text-on-background">PXL-98-32</p></div>
+<div><p class="text-on-surface-variant">NIV / VIN</p><p id="vehiculo-niv" class="font-bold text-on-background">WAUZZZ8X...</p></div>
+<div><p class="text-on-surface-variant">Placas</p><p id="vehiculo-placas" class="font-bold text-on-background">PXL-98-32</p></div>
 </div>
 
 <div class="flex flex-col sm:flex-row gap-3">
-<a href="04-resultado.html?id=AS-7K4P9X2M" class="flex-1 bg-primary-container text-on-primary-fixed font-bold px-6 py-3.5 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2">
+<a id="link-reporte-completo" href="04-resultado.html?id=AS-7K4P9X2M" class="flex-1 bg-primary-container text-on-primary-fixed font-bold px-6 py-3.5 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2">
 Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span>
 </a>
 <button class="flex-1 border border-outline-variant text-on-background font-bold px-6 py-3.5 rounded-full hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2">
@@ -100,18 +101,18 @@ Descargar PDF <span class="material-symbols-outlined text-base" aria-hidden="tru
 </defs>
 <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#333" stroke-linecap="round" stroke-width="14"></path>
 <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad2)" stroke-dasharray="251" stroke-dashoffset="45" stroke-linecap="round" stroke-width="14"></path>
-<g transform="rotate(57.6, 100, 100)">
+<g id="gauge-needle" transform="rotate(57.6, 100, 100)">
 <polygon fill="#fff" points="98,100 102,100 100,45"></polygon>
 <circle cx="100" cy="100" fill="#fff" r="6"></circle>
 </g>
 </svg>
 </div>
 <div class="flex items-baseline gap-1 -mt-2">
-<span class="text-4xl font-bold text-primary-container">82</span>
+<span id="score-numero" class="text-4xl font-bold text-primary-container">82</span>
 <span class="text-on-surface-variant text-sm">/100</span>
 </div>
-<span class="mt-3 inline-flex items-center gap-2 bg-[#152e20] text-primary-container border border-primary-container/30 font-bold text-xs uppercase tracking-widest px-3 py-1.5 rounded-full">
-<span class="w-2 h-2 rounded-full bg-primary-container" aria-hidden="true"></span> Riesgo bajo
+<span id="riesgo-badge" class="mt-3 inline-flex items-center gap-2 bg-[#152e20] text-primary-container border border-primary-container/30 font-bold text-xs uppercase tracking-widest px-3 py-1.5 rounded-full">
+<span id="riesgo-badge-dot" class="w-2 h-2 rounded-full bg-primary-container" aria-hidden="true"></span> <span id="riesgo-texto">Riesgo bajo</span>
 </span>
 </div>
 
@@ -128,5 +129,80 @@ Descargar PDF <span class="material-symbols-outlined text-base" aria-hidden="tru
 </div>
 </div>
 </footer>
+
+<script>
+    const sb = window.supabase.createClient(
+        'https://nnlxcelrbkreffxotezo.supabase.co',
+        'sb_publishable_WRLtbtqL5VDKbUhY-tzGEw_SkEbne5j'
+    );
+
+    const RIESGO_ESTILO = {
+        bajo: { bg: '#152e20', color: 'text-primary-container', border: 'border-primary-container/30', dot: 'bg-primary-container', texto: 'Riesgo bajo' },
+        medio: { bg: '#332a12', color: 'text-warn', border: 'border-warn/30', dot: 'bg-warn', texto: 'Riesgo medio' },
+        alto: { bg: '#3a1414', color: '', border: '', dot: '', texto: 'Riesgo alto', styleColor: '#FF5252' }
+    };
+
+    (async function cargar() {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+            window.location.href = 'consultar-reporte.html';
+            return;
+        }
+
+        const reportId = new URLSearchParams(window.location.search).get('id');
+        if (!reportId) {
+            window.location.href = 'consultar-reporte.html';
+            return;
+        }
+
+        const { data, error } = await sb
+            .from('reports')
+            .select('id, status, autoscore, risk_level, analysis_completed_at, vehicles ( marca, modelo, anio, kilometraje, precio_venta, niv, placas )')
+            .eq('id', reportId)
+            .limit(1);
+
+        if (error || !data || data.length === 0) {
+            window.location.href = 'consultar-reporte.html';
+            return;
+        }
+
+        const reporte = data[0];
+        document.getElementById('reporte-fecha-texto').textContent = 'Reporte ' + reporte.id +
+            (reporte.analysis_completed_at ? ' generado el ' + new Date(reporte.analysis_completed_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) : '');
+        document.getElementById('link-reporte-completo').href = '04-resultado.html?id=' + encodeURIComponent(reporte.id);
+
+        const v = reporte.vehicles;
+        if (v) {
+            document.getElementById('vehiculo-titulo').textContent = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ');
+            const detalle = [];
+            if (v.kilometraje) detalle.push(v.kilometraje.toLocaleString('es-MX') + ' km');
+            if (v.precio_venta) detalle.push('$' + Number(v.precio_venta).toLocaleString('es-MX') + ' MXN');
+            document.getElementById('vehiculo-detalle').textContent = detalle.join(' · ');
+            document.getElementById('vehiculo-niv').textContent = v.niv || 'No proporcionado';
+            document.getElementById('vehiculo-placas').textContent = v.placas || 'No proporcionadas';
+        }
+
+        if (typeof reporte.autoscore === 'number') {
+            document.getElementById('score-numero').textContent = reporte.autoscore;
+            const angulo = -90 + (reporte.autoscore / 100) * 180;
+            document.getElementById('gauge-needle').setAttribute('transform', 'rotate(' + angulo + ', 100, 100)');
+        }
+
+        const estilo = RIESGO_ESTILO[reporte.risk_level] || RIESGO_ESTILO.bajo;
+        const badge = document.getElementById('riesgo-badge');
+        badge.style.background = estilo.bg;
+        if (estilo.styleColor) {
+            badge.style.color = estilo.styleColor;
+            badge.style.borderColor = estilo.styleColor + '4D';
+            badge.className = 'mt-3 inline-flex items-center gap-2 border font-bold text-xs uppercase tracking-widest px-3 py-1.5 rounded-full';
+            document.getElementById('riesgo-badge-dot').style.background = estilo.styleColor;
+            document.getElementById('riesgo-badge-dot').className = 'w-2 h-2 rounded-full';
+        } else {
+            badge.className = 'mt-3 inline-flex items-center gap-2 ' + estilo.color + ' border ' + estilo.border + ' font-bold text-xs uppercase tracking-widest px-3 py-1.5 rounded-full';
+            document.getElementById('riesgo-badge-dot').className = 'w-2 h-2 rounded-full ' + estilo.dot;
+        }
+        document.getElementById('riesgo-texto').textContent = estilo.texto;
+    })();
+</script>
 </body>
 </html>

@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -52,7 +53,13 @@
 </nav>
 
 <main class="flex-grow px-4 md:px-16 py-10">
-<div class="max-w-5xl mx-auto w-full flex flex-col gap-8">
+<div id="estado-no-encontrado" class="hidden max-w-md mx-auto w-full flex flex-col items-center text-center gap-4 py-16">
+<span class="material-symbols-outlined text-warn" style="font-size:2.5rem" aria-hidden="true">search_off</span>
+<h1 class="text-2xl font-bold text-on-background">No encontramos este reporte</h1>
+<p class="text-on-surface-variant">Puede que el enlace esté incompleto o que el reporte no esté asociado a tu correo verificado.</p>
+<a href="consultar-reporte.html" class="bg-primary-container text-on-primary-fixed font-bold px-6 py-3 rounded-full hover:brightness-110 transition-all">Consultar mi reporte</a>
+</div>
+<div id="contenido-resultado" class="max-w-5xl mx-auto w-full flex flex-col gap-8">
 
 <div>
 <span class="inline-flex items-center gap-2 text-primary-container font-bold text-xs uppercase tracking-widest mb-3">
@@ -96,7 +103,7 @@
 <p class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Recomendación</p>
 <div class="flex items-center gap-3">
 <div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
-<span class="material-symbols-outlined text-primary-container" aria-hidden="true">verified</span>
+<span id="recomendacion-icono" class="material-symbols-outlined text-primary-container" aria-hidden="true">verified</span>
 </div>
 <h2 id="recomendacion-titulo" class="text-xl font-bold text-on-background">Compra recomendable</h2>
 </div>
@@ -120,15 +127,15 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
 <span class="flex items-center gap-2 text-sm font-bold"><span class="material-symbols-outlined text-primary-container text-lg" aria-hidden="true">history</span> Historial</span>
 <span class="flex items-center gap-1 text-sm text-primary-container">Sin alertas identificadas <span class="material-symbols-outlined text-lg" aria-hidden="true">check_circle</span></span>
 </div>
-<div class="flex items-center justify-between py-3" data-categoria="identidad">
+<div class="flex items-center justify-between py-3" data-categoria="identidad_vehiculo">
 <span class="flex items-center gap-2 text-sm font-bold"><span class="material-symbols-outlined text-primary-container text-lg" aria-hidden="true">badge</span> Identidad del vehículo</span>
 <span class="flex items-center gap-1 text-sm text-primary-container">Información consistente <span class="material-symbols-outlined text-lg" aria-hidden="true">check_circle</span></span>
 </div>
-<div class="flex items-center justify-between py-3" data-categoria="precio">
+<div class="flex items-center justify-between py-3" data-categoria="precio_mercado">
 <span class="flex items-center gap-2 text-sm font-bold"><span class="material-symbols-outlined text-primary-container text-lg" aria-hidden="true">payments</span> Precio de mercado</span>
 <span class="flex items-center gap-1 text-sm text-primary-container">En rango <span class="material-symbols-outlined text-lg" aria-hidden="true">check_circle</span></span>
 </div>
-<div class="flex items-center justify-between py-3" data-categoria="imagenes">
+<div class="flex items-center justify-between py-3" data-categoria="analisis_imagenes">
 <span class="flex items-center gap-2 text-sm font-bold"><span class="material-symbols-outlined text-primary-container text-lg" aria-hidden="true">photo_camera</span> Análisis de imágenes</span>
 <span class="flex items-center gap-1 text-sm text-primary-container">Información consistente <span class="material-symbols-outlined text-lg" aria-hidden="true">check_circle</span></span>
 </div>
@@ -138,7 +145,7 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
 </div>
 </div>
 
-<div class="bg-surface-container-lowest rounded-xl p-5 mt-2">
+<div id="puntos-validar-seccion" class="bg-surface-container-lowest rounded-xl p-5 mt-2">
 <p class="flex items-center gap-2 font-bold text-warn text-sm uppercase tracking-wide mb-4"><span class="material-symbols-outlined" aria-hidden="true">warning</span> Puntos a validar</p>
 <div id="puntos-validar-lista" class="flex flex-col gap-4">
 <div class="flex gap-3" data-punto="1">
@@ -189,13 +196,173 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
 </footer>
 
 <script>
-    // Prototipo estático: aún no consulta Supabase. Solo lee el id de la URL y lo
-    // refleja en pantalla, para que la Fase B ya tenga de dónde tomar qué reporte pedir
-    // (report_findings / report_validation_points filtrados por este id + el correo autenticado).
-    const reportId = new URLSearchParams(window.location.search).get('id');
-    if (reportId) {
-        document.getElementById('report-id').textContent = reportId;
+    const sb = window.supabase.createClient(
+        'https://nnlxcelrbkreffxotezo.supabase.co',
+        'sb_publishable_WRLtbtqL5VDKbUhY-tzGEw_SkEbne5j'
+    );
+
+    const RIESGO_ESTILO = {
+        bajo: { bg: '#152e20', color: 'text-primary-container', border: 'border-primary-container/30', dot: 'bg-primary-container', texto: 'Riesgo bajo' },
+        medio: { bg: '#332a12', color: 'text-warn', border: 'border-warn/30', dot: 'bg-warn', texto: 'Riesgo medio' },
+        alto: { bg: '#3a1414', styleColor: '#FF5252', texto: 'Riesgo alto' }
+    };
+    const RECOMENDACION = {
+        bajo: { titulo: 'Compra recomendable', icono: 'verified' },
+        medio: { titulo: 'Revisar con cuidado', icono: 'info' },
+        alto: { titulo: 'No recomendable', icono: 'dangerous' }
+    };
+    const FINDING_ESTILO = {
+        ok: { icono: 'check_circle', clase: 'text-primary-container' },
+        advertencia: { icono: 'error', clase: 'text-warn', borde: '#FFAB40' },
+        sin_datos: { icono: 'help', clase: 'text-on-surface-variant' }
+    };
+    const FINDING_ESTILO_DEFAULT = { icono: 'schedule', clase: 'text-on-surface-variant', textoDefault: 'Pendiente de revisión' };
+
+    function mostrarNoEncontrado() {
+        document.getElementById('estado-no-encontrado').classList.remove('hidden');
+        document.getElementById('contenido-resultado').classList.add('hidden');
     }
+
+    function pintarBadgeRiesgo(riskLevel) {
+        const estilo = RIESGO_ESTILO[riskLevel] || RIESGO_ESTILO.bajo;
+        const badge = document.getElementById('riesgo-badge');
+        const dot = document.getElementById('riesgo-badge-dot') || document.querySelector('#riesgo-badge span[aria-hidden]');
+        badge.style.background = estilo.bg;
+        if (estilo.styleColor) {
+            badge.className = 'mt-3 inline-flex items-center gap-2 border font-bold text-xs uppercase tracking-widest px-3 py-1.5 rounded-full';
+            badge.style.color = estilo.styleColor;
+            badge.style.borderColor = estilo.styleColor + '4D';
+            dot.className = 'w-2 h-2 rounded-full';
+            dot.style.background = estilo.styleColor;
+        } else {
+            badge.className = 'mt-3 inline-flex items-center gap-2 ' + estilo.color + ' border ' + estilo.border + ' font-bold text-xs uppercase tracking-widest px-3 py-1.5 rounded-full';
+            dot.className = 'w-2 h-2 rounded-full ' + estilo.dot;
+            dot.style.background = '';
+        }
+        document.getElementById('riesgo-texto').textContent = estilo.texto;
+    }
+
+    function pintarHallazgos(findings) {
+        const porCategoria = {};
+        (findings || []).forEach(f => { porCategoria[f.category] = f; });
+
+        document.querySelectorAll('#hallazgos-lista [data-categoria]').forEach(fila => {
+            const categoria = fila.dataset.categoria;
+            const dato = porCategoria[categoria];
+            const textoContenedor = fila.lastElementChild;
+            const iconoEstado = textoContenedor.querySelector('.material-symbols-outlined');
+
+            const estilo = dato ? (FINDING_ESTILO[dato.status] || FINDING_ESTILO_DEFAULT) : FINDING_ESTILO_DEFAULT;
+            const texto = dato ? dato.detail : FINDING_ESTILO_DEFAULT.textoDefault;
+
+            textoContenedor.className = 'flex items-center gap-1 text-sm ' + estilo.clase;
+            textoContenedor.firstChild.textContent = texto + ' ';
+            iconoEstado.textContent = estilo.icono;
+
+            if (estilo.borde) {
+                fila.classList.add('border-l-2', 'pl-3');
+                fila.style.borderLeftColor = estilo.borde;
+            } else {
+                fila.classList.remove('border-l-2', 'pl-3');
+                fila.style.borderLeftColor = '';
+            }
+        });
+    }
+
+    function pintarPuntosValidar(puntos) {
+        const lista = document.getElementById('puntos-validar-lista');
+        const seccion = document.getElementById('puntos-validar-seccion');
+        if (!puntos || puntos.length === 0) {
+            seccion.classList.add('hidden');
+            return;
+        }
+        seccion.classList.remove('hidden');
+        lista.innerHTML = '';
+        puntos.forEach((p, i) => {
+            const fila = document.createElement('div');
+            fila.className = 'flex gap-3';
+            fila.innerHTML =
+                '<span class="w-6 h-6 rounded-full bg-warn/20 text-warn font-bold text-xs flex items-center justify-center shrink-0">' + (i + 1) + '</span>' +
+                '<div><p class="font-bold text-on-background text-sm"></p><p class="text-sm text-on-surface-variant"></p></div>';
+            fila.querySelector('p.font-bold').textContent = p.titulo;
+            fila.querySelector('p.text-on-surface-variant').textContent = p.descripcion;
+            lista.appendChild(fila);
+        });
+    }
+
+    (async function cargar() {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+            window.location.href = 'consultar-reporte.html';
+            return;
+        }
+
+        const reportId = new URLSearchParams(window.location.search).get('id');
+        if (!reportId) {
+            mostrarNoEncontrado();
+            return;
+        }
+
+        const { data: reportes, error } = await sb
+            .from('reports')
+            .select('id, status, autoscore, risk_level, recommendation_text, vehicles ( marca, modelo, anio, kilometraje, precio_venta, lugar_compra )')
+            .eq('id', reportId)
+            .limit(1);
+
+        if (error || !reportes || reportes.length === 0) {
+            mostrarNoEncontrado();
+            return;
+        }
+
+        const reporte = reportes[0];
+
+        if (reporte.status !== 'completado') {
+            window.location.href = 'reporte-en-preparacion.html?id=' + encodeURIComponent(reporte.id) + '&status=' + encodeURIComponent(reporte.status);
+            return;
+        }
+
+        document.getElementById('report-id').textContent = reporte.id;
+
+        const v = reporte.vehicles;
+        if (v) {
+            const nombre = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ');
+            document.getElementById('vehiculo-titulo').textContent = nombre;
+            const detalle = [];
+            if (v.kilometraje) detalle.push(v.kilometraje.toLocaleString('es-MX') + ' km');
+            if (v.precio_venta) detalle.push('$' + Number(v.precio_venta).toLocaleString('es-MX') + ' MXN');
+            if (v.lugar_compra) detalle.push(v.lugar_compra);
+            document.getElementById('vehiculo-detalle').textContent = detalle.join(' · ');
+
+            document.getElementById('detalle-vehiculo').textContent = [v.marca, v.modelo].filter(Boolean).join(' ');
+            document.getElementById('detalle-anio').textContent = v.anio || '—';
+            document.getElementById('detalle-km').textContent = v.kilometraje ? v.kilometraje.toLocaleString('es-MX') + ' km' : '—';
+            document.getElementById('detalle-precio').textContent = v.precio_venta ? '$' + Number(v.precio_venta).toLocaleString('es-MX') + ' MXN' : '—';
+            document.getElementById('detalle-ubicacion').textContent = v.lugar_compra || '—';
+        }
+
+        if (typeof reporte.autoscore === 'number') {
+            document.getElementById('score-numero').textContent = reporte.autoscore;
+            const angulo = -90 + (reporte.autoscore / 100) * 180;
+            document.getElementById('gauge-needle').setAttribute('transform', 'rotate(' + angulo + ', 100, 100)');
+        }
+
+        pintarBadgeRiesgo(reporte.risk_level);
+
+        const rec = RECOMENDACION[reporte.risk_level] || RECOMENDACION.bajo;
+        document.getElementById('recomendacion-titulo').textContent = rec.titulo;
+        document.getElementById('recomendacion-icono').textContent = rec.icono;
+        if (reporte.recommendation_text) {
+            document.getElementById('recomendacion-texto').textContent = reporte.recommendation_text;
+        }
+
+        const [{ data: findings }, { data: puntos }] = await Promise.all([
+            sb.from('report_findings').select('category, status, detail').eq('report_id', reporte.id),
+            sb.from('report_validation_points').select('titulo, descripcion, orden').eq('report_id', reporte.id).order('orden')
+        ]);
+
+        pintarHallazgos(findings);
+        pintarPuntosValidar(puntos);
+    })();
 </script>
 </body>
 </html>
