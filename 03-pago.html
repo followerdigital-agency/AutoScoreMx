@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -87,8 +88,6 @@
 <!-- Columna izquierda -->
 <div class="flex flex-col gap-6">
 <div class="bg-level-1 rounded-2xl p-6">
-<!-- NOTA: "Audi A1 2018", NIV/Placas y las fotos cargadas son contenido de ejemplo (mock).
-     Cuando exista backend, esta tarjeta debe reflejar lo que el usuario capturó en las Pantallas 01 y 02. -->
 <div class="flex items-center justify-between mb-4">
 <p class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Tu vehículo</p>
 <a href="01-datos-auto.html" class="text-sm font-bold text-primary-container border border-outline-variant rounded-full px-4 py-1.5 hover:bg-surface-container-high transition-colors">Editar</a>
@@ -98,31 +97,26 @@
 <span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
 </div>
 <div>
-<h2 class="font-bold text-on-background">Audi A1 2018</h2>
-<p class="text-xs text-on-surface-variant uppercase tracking-wide">Agencia seminuevos</p>
+<h2 id="vehiculo-titulo" class="font-bold text-on-background">Audi A1 2018</h2>
+<p id="vehiculo-lugar" class="text-xs text-on-surface-variant uppercase tracking-wide">Agencia seminuevos</p>
 </div>
 </div>
 <div class="grid grid-cols-2 gap-4 text-sm">
 <div>
 <p class="text-on-surface-variant">Kilometraje</p>
-<p class="font-bold text-on-background">65,000 km</p>
+<p id="detalle-km" class="font-bold text-on-background">65,000 km</p>
 </div>
 <div>
 <p class="text-on-surface-variant">Precio publicado</p>
-<p class="font-bold text-on-background">$215,000 MXN</p>
+<p id="detalle-precio" class="font-bold text-on-background">$215,000 MXN</p>
 </div>
 <div class="col-span-2">
 <p class="text-on-surface-variant">NIV / Placas</p>
-<p class="font-bold text-on-background italic text-on-surface-variant">No proporcionado</p>
+<p id="detalle-niv-placas" class="font-bold text-on-background italic text-on-surface-variant">No proporcionado</p>
 </div>
 <div class="col-span-2">
-<p class="text-on-surface-variant mb-1">Fotos cargadas <span class="font-bold text-primary-container">(4/6)</span></p>
-<ul class="flex flex-col gap-1">
-<li class="flex items-center gap-2 text-on-background"><span class="material-symbols-outlined text-primary-container text-base" aria-hidden="true">check_circle</span> Tablero</li>
-<li class="flex items-center gap-2 text-on-background"><span class="material-symbols-outlined text-primary-container text-base" aria-hidden="true">check_circle</span> NIV / Placa</li>
-<li class="flex items-center gap-2 text-on-background"><span class="material-symbols-outlined text-primary-container text-base" aria-hidden="true">check_circle</span> Exterior — Frente</li>
-<li class="flex items-center gap-2 text-on-background"><span class="material-symbols-outlined text-primary-container text-base" aria-hidden="true">check_circle</span> Exterior — Trasera</li>
-</ul>
+<p class="text-on-surface-variant mb-1">Fotos cargadas <span id="fotos-contador" class="font-bold text-primary-container">(0/6)</span></p>
+<ul id="fotos-lista" class="flex flex-col gap-1"></ul>
 </div>
 </div>
 </div>
@@ -205,6 +199,58 @@
 </footer>
 
 <script>
+    const sb = window.supabase.createClient(
+        'https://nnlxcelrbkreffxotezo.supabase.co',
+        'sb_publishable_WRLtbtqL5VDKbUhY-tzGEw_SkEbne5j'
+    );
+
+    const NOMBRES_SLOTS = {
+        'tablero': 'Tablero', 'niv': 'NIV / Placa', 'ext-frente': 'Exterior — Frente',
+        'ext-izq': 'Exterior — Lado izq.', 'ext-der': 'Exterior — Lado der.', 'ext-trasera': 'Exterior — Trasera'
+    };
+
+    (async function cargarVehiculo() {
+        const vehicleId = sessionStorage.getItem('as_vehicle_id');
+        if (!vehicleId) {
+            window.location.href = '01-datos-auto.html';
+            return;
+        }
+
+        const [{ data: vdata }, { data: fotos }] = await Promise.all([
+            sb.from('vehicles').select('marca, modelo, anio, lugar_compra, kilometraje, precio_venta, niv, placas, estado_placas').eq('id', vehicleId).limit(1),
+            sb.from('vehicle_photos').select('slot').eq('vehicle_id', vehicleId)
+        ]);
+
+        if (!vdata || vdata.length === 0) {
+            window.location.href = '01-datos-auto.html';
+            return;
+        }
+
+        const v = vdata[0];
+        document.getElementById('vehiculo-titulo').textContent = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ');
+        document.getElementById('vehiculo-lugar').textContent = v.lugar_compra || '';
+        document.getElementById('detalle-km').textContent = v.kilometraje ? v.kilometraje.toLocaleString('es-MX') + ' km' : 'No proporcionado';
+        document.getElementById('detalle-precio').textContent = v.precio_venta ? '$' + Number(v.precio_venta).toLocaleString('es-MX') + ' MXN' : 'No proporcionado';
+
+        const nivPlacas = document.getElementById('detalle-niv-placas');
+        if (v.niv) {
+            nivPlacas.textContent = v.niv;
+            nivPlacas.classList.remove('italic', 'text-on-surface-variant');
+        } else if (v.placas) {
+            nivPlacas.textContent = v.placas + (v.estado_placas ? ' · ' + v.estado_placas : '');
+            nivPlacas.classList.remove('italic', 'text-on-surface-variant');
+        }
+
+        document.getElementById('fotos-contador').textContent = '(' + (fotos ? fotos.length : 0) + '/6)';
+        const lista = document.getElementById('fotos-lista');
+        (fotos || []).forEach(f => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center gap-2 text-on-background';
+            li.innerHTML = '<span class="material-symbols-outlined text-primary-container text-base" aria-hidden="true">check_circle</span> ' + (NOMBRES_SLOTS[f.slot] || f.slot);
+            lista.appendChild(li);
+        });
+    })();
+
     // Solo dígitos, sin límite de longitud propio (lo controla maxlength del input)
     function soloDigitos(input) {
         input.value = input.value.replace(/[^0-9]/g, '');

@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -125,8 +126,9 @@
 <p id="lugar-error" class="hidden text-sm" style="color:#FF5252">Selecciona dónde estás comprando el auto.</p>
 </div>
 
-<button type="submit" class="w-full sm:w-auto self-start bg-primary-container text-on-primary-fixed font-bold px-8 py-4 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2">
-<span>Continuar</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+<p id="guardar-error" class="hidden text-sm" style="color:#FF5252">No pudimos guardar tus datos. Revisa tu conexión e inténtalo de nuevo.</p>
+<button id="btn-continuar" type="submit" class="w-full sm:w-auto self-start bg-primary-container text-on-primary-fixed font-bold px-8 py-4 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+<span id="btn-continuar-texto">Continuar</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
 </button>
 </form>
 
@@ -173,17 +175,28 @@
 </main>
 
 <script>
+    const sb = window.supabase.createClient(
+        'https://nnlxcelrbkreffxotezo.supabase.co',
+        'sb_publishable_WRLtbtqL5VDKbUhY-tzGEw_SkEbne5j'
+    );
+
     let lugarSeleccionado = '';
     const chips = document.querySelectorAll('.lugar-chip');
     chips.forEach(chip => {
         chip.addEventListener('click', () => {
-            chips.forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-checked', 'false'); });
-            chip.classList.add('selected');
-            chip.setAttribute('aria-checked', 'true');
-            lugarSeleccionado = chip.dataset.value;
+            seleccionarLugar(chip.dataset.value);
             document.getElementById('lugar-error').classList.add('hidden');
         });
     });
+
+    function seleccionarLugar(valor) {
+        lugarSeleccionado = valor;
+        chips.forEach(c => {
+            const activo = c.dataset.value === valor;
+            c.classList.toggle('selected', activo);
+            c.setAttribute('aria-checked', activo ? 'true' : 'false');
+        });
+    }
 
     function updatePreview() {
         const marca = document.getElementById('marca').value.trim();
@@ -197,18 +210,60 @@
         }
     }
 
-    function handleSubmit(event) {
+    // Si venimos de "Editar" desde la pantalla 02/03, precarga lo que ya se había guardado.
+    (async function precargarSiExiste() {
+        const vehicleId = sessionStorage.getItem('as_vehicle_id');
+        if (!vehicleId) return;
+
+        const { data, error } = await sb.from('vehicles').select('marca, modelo, anio, lugar_compra').eq('id', vehicleId).limit(1);
+        if (error || !data || data.length === 0) return;
+
+        const v = data[0];
+        document.getElementById('marca').value = v.marca || '';
+        document.getElementById('modelo').value = v.modelo || '';
+        document.getElementById('anio').value = v.anio || '';
+        if (v.lugar_compra) seleccionarLugar(v.lugar_compra);
+        updatePreview();
+    })();
+
+    async function handleSubmit(event) {
         event.preventDefault();
         const marca = document.getElementById('marca').value.trim();
         const modelo = document.getElementById('modelo').value.trim();
         const anio = document.getElementById('anio').value.trim();
+        const errorGuardar = document.getElementById('guardar-error');
+        errorGuardar.classList.add('hidden');
+
         if (!lugarSeleccionado) {
             document.getElementById('lugar-error').classList.remove('hidden');
             document.getElementById('lugar-group').scrollIntoView({ behavior: 'smooth', block: 'center' });
             return false;
         }
         if (!marca || !modelo || !anio) return false;
-        // Prototipo estático: navega a la siguiente pantalla (sin persistencia real de datos)
+
+        const boton = document.getElementById('btn-continuar');
+        boton.disabled = true;
+        document.getElementById('btn-continuar-texto').textContent = 'Guardando...';
+
+        const datos = { marca, modelo, anio: parseInt(anio, 10), lugar_compra: lugarSeleccionado };
+        const vehicleIdExistente = sessionStorage.getItem('as_vehicle_id');
+
+        let resultado;
+        if (vehicleIdExistente) {
+            resultado = await sb.from('vehicles').update(datos).eq('id', vehicleIdExistente).select().single();
+        } else {
+            resultado = await sb.from('vehicles').insert(datos).select().single();
+        }
+
+        boton.disabled = false;
+        document.getElementById('btn-continuar-texto').textContent = 'Continuar';
+
+        if (resultado.error || !resultado.data) {
+            errorGuardar.classList.remove('hidden');
+            return false;
+        }
+
+        sessionStorage.setItem('as_vehicle_id', resultado.data.id);
         window.location.href = '02-informacion-adicional.html';
         return false;
     }

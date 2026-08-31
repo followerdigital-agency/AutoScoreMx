@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -101,8 +102,8 @@
 <span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
 </div>
 <div>
-<h2 class="font-bold text-on-background">Audi A1 2018</h2>
-<p class="text-xs text-on-surface-variant uppercase tracking-wide">Agencia seminuevos</p>
+<h2 id="resumen-vehiculo-titulo" class="font-bold text-on-background">Audi A1 2018</h2>
+<p id="resumen-vehiculo-lugar" class="text-xs text-on-surface-variant uppercase tracking-wide">Agencia seminuevos</p>
 </div>
 </div>
 <a href="01-datos-auto.html" class="text-sm font-bold text-primary-container border border-outline-variant rounded-full px-4 py-2 hover:bg-surface-container-high transition-colors">Editar</a>
@@ -218,6 +219,7 @@
 </label>
 </div>
 <p class="text-xs text-on-surface-variant">Entre más fotos agregues, más preciso será el cruce de información de tu análisis.</p>
+<p id="foto-error" class="hidden text-sm" style="color:#FF5252">No pudimos subir esa foto. Revisa tu conexión e inténtalo de nuevo.</p>
 </div>
 
 <div class="flex flex-col gap-2">
@@ -230,13 +232,14 @@
 </div>
 </div>
 
+<p id="guardar-error" class="hidden text-sm" style="color:#FF5252">No pudimos guardar tus datos. Revisa tu conexión e inténtalo de nuevo.</p>
 <div class="flex items-center justify-between">
 <a href="01-datos-auto.html" class="text-on-surface-variant font-bold flex items-center gap-1 hover:text-on-background transition-colors">
 <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span> Volver
 </a>
-<a href="03-pago.html" class="bg-primary-container text-on-primary-fixed font-bold px-8 py-4 rounded-full hover:brightness-110 transition-all flex items-center gap-2">
-<span>Continuar</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-</a>
+<button id="btn-continuar" onclick="handleContinuar()" class="bg-primary-container text-on-primary-fixed font-bold px-8 py-4 rounded-full hover:brightness-110 transition-all flex items-center gap-2 disabled:opacity-60">
+<span id="btn-continuar-texto">Continuar</span> <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+</button>
 </div>
 </div>
 
@@ -277,6 +280,16 @@
 </main>
 
 <script>
+    const sb = window.supabase.createClient(
+        'https://nnlxcelrbkreffxotezo.supabase.co',
+        'sb_publishable_WRLtbtqL5VDKbUhY-tzGEw_SkEbne5j'
+    );
+
+    const vehicleId = sessionStorage.getItem('as_vehicle_id');
+    if (!vehicleId) {
+        window.location.href = '01-datos-auto.html';
+    }
+
     function mostrarNiv() {
         document.getElementById('btn-tiene-niv').classList.add('selected');
         document.getElementById('btn-no-niv').classList.remove('selected');
@@ -304,26 +317,49 @@
     };
     let fotosCargadas = [];
 
-    function fotoSubida(input, slot) {
+    function marcarSlotLleno(slot) {
+        const label = document.querySelector('.photo-slot[data-slot="' + slot + '"]');
+        if (label.classList.contains('filled')) return;
+        fotosSubidas++;
+        fotosCargadas.push(slot);
+        label.classList.add('filled');
+        label.querySelector('.photo-icon').textContent = 'check_circle';
+        label.querySelector('.photo-status').classList.remove('hidden');
+        document.getElementById('foto-counter').textContent = fotosSubidas + '/' + TOTAL_FOTOS;
+    }
+
+    async function fotoSubida(input, slot) {
+        if (!input.files || input.files.length === 0) return;
+        const file = input.files[0];
         const label = input.closest('.photo-slot');
         const icono = label.querySelector('.photo-icon');
-        const status = label.querySelector('.photo-status');
-        if (input.files && input.files.length > 0) {
-            if (!label.classList.contains('filled')) {
-                fotosSubidas++;
-                fotosCargadas.push(slot);
-                label.classList.add('filled');
-                icono.textContent = 'check_circle';
-                status.classList.remove('hidden');
-            }
-        } else if (label.classList.contains('filled')) {
-            fotosSubidas--;
-            fotosCargadas = fotosCargadas.filter(s => s !== slot);
-            label.classList.remove('filled');
-            icono.textContent = iconosOriginales[slot];
-            status.classList.add('hidden');
+        const iconoOriginal = icono.textContent;
+        const errorEl = document.getElementById('foto-error');
+        errorEl.classList.add('hidden');
+
+        icono.textContent = 'progress_activity';
+
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        const ruta = vehicleId + '/' + slot + '.' + ext;
+
+        const { error: uploadError } = await sb.storage.from('vehicle-photos').upload(ruta, file, { upsert: true });
+        if (uploadError) {
+            icono.textContent = iconoOriginal;
+            errorEl.classList.remove('hidden');
+            input.value = '';
+            return;
         }
-        document.getElementById('foto-counter').textContent = fotosSubidas + '/' + TOTAL_FOTOS;
+
+        const { error: dbError } = await sb.from('vehicle_photos')
+            .upsert({ vehicle_id: vehicleId, slot: slot, storage_path: ruta }, { onConflict: 'vehicle_id,slot' });
+        if (dbError) {
+            icono.textContent = iconoOriginal;
+            errorEl.classList.remove('hidden');
+            input.value = '';
+            return;
+        }
+
+        marcarSlotLleno(slot);
         actualizarChecks();
     }
 
@@ -379,6 +415,73 @@
     }
 
     actualizarChecks();
+
+    // Precarga lo que ya se hubiera guardado (si el usuario regresó a esta pantalla).
+    (async function precargar() {
+        if (!vehicleId) return;
+
+        const [{ data: vdata }, { data: fotos }] = await Promise.all([
+            sb.from('vehicles').select('marca, modelo, anio, lugar_compra, kilometraje, precio_venta, niv, placas, estado_placas').eq('id', vehicleId).limit(1),
+            sb.from('vehicle_photos').select('slot').eq('vehicle_id', vehicleId)
+        ]);
+
+        if (vdata && vdata.length > 0) {
+            const v = vdata[0];
+            document.getElementById('resumen-vehiculo-titulo').textContent = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ');
+            document.getElementById('resumen-vehiculo-lugar').textContent = v.lugar_compra || '';
+
+            if (v.kilometraje) document.getElementById('km').value = v.kilometraje;
+            if (v.precio_venta) document.getElementById('precio').value = v.precio_venta;
+
+            if (v.niv) {
+                document.getElementById('niv').value = v.niv;
+                mostrarNiv();
+            } else if (v.placas || v.estado_placas) {
+                document.getElementById('placas').value = v.placas || '';
+                document.getElementById('estado').value = v.estado_placas || '';
+                mostrarPlacas();
+            }
+        }
+
+        (fotos || []).forEach(f => marcarSlotLleno(f.slot));
+        actualizarChecks();
+    })();
+
+    async function handleContinuar() {
+        const errorGuardar = document.getElementById('guardar-error');
+        errorGuardar.classList.add('hidden');
+
+        const km = document.getElementById('km').value.replace(/[^0-9]/g, '');
+        const precio = document.getElementById('precio').value.replace(/[^0-9]/g, '');
+        const tieneNiv = !document.getElementById('niv-field').classList.contains('hidden');
+        const niv = document.getElementById('niv').value.trim();
+        const placas = document.getElementById('placas').value.trim();
+        const estado = document.getElementById('estado').value.trim();
+
+        const datos = {
+            kilometraje: km ? parseInt(km, 10) : null,
+            precio_venta: precio ? parseInt(precio, 10) : null,
+            niv: tieneNiv ? (niv || null) : null,
+            placas: !tieneNiv ? (placas || null) : null,
+            estado_placas: !tieneNiv ? (estado || null) : null
+        };
+
+        const boton = document.getElementById('btn-continuar');
+        boton.disabled = true;
+        document.getElementById('btn-continuar-texto').textContent = 'Guardando...';
+
+        const { error } = await sb.from('vehicles').update(datos).eq('id', vehicleId);
+
+        boton.disabled = false;
+        document.getElementById('btn-continuar-texto').textContent = 'Continuar';
+
+        if (error) {
+            errorGuardar.classList.remove('hidden');
+            return;
+        }
+
+        window.location.href = '03-pago.html';
+    }
 </script>
 </body>
 </html>
