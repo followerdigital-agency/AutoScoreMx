@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin - AutoScoreMX</title>
+<meta name="robots" content="noindex"/>
+<link href="favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-surface": "#dbe5d9",
+                        "on-surface-variant": "#c7d6c6",
+                        "outline-variant": "#3b4a3d",
+                        "on-background": "#dbe5d9",
+                        "primary-container": "#00e678",
+                        "on-primary-fixed": "#00210c",
+                        "background": "#0d150e",
+                        "surface-container-lowest": "#081009",
+                        "surface-container-low": "#151e16",
+                        "surface-container-high": "#232c24",
+                        "bg-level-0": "#1A1A1A",
+                        "bg-level-1": "#2A2A2A",
+                        "border-level-1": "#3A3A3A",
+                        "warn": "#FFAB40"
+                    },
+                    fontFamily: { sans: ["Montserrat", "sans-serif"] }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .bg-level-0 { background-color: #1A1A1A; }
+        .bg-level-1 { background-color: #2A2A2A; border: 1px solid #3A3A3A; }
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 2px solid #00e678; outline-offset: 2px; border-radius: 4px;
+        }
+        .otp-box {
+            width: 100%; aspect-ratio: 1; text-align: center; font-size: 1.5rem; font-weight: 700;
+            background: #151e16; border: 1px solid #3A3A3A; border-radius: 10px; color: #dbe5d9;
+        }
+        .otp-box:focus { border-color: #00e678; }
+        .status-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+        .filtro-tab { font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 999px; border: 1px solid #3A3A3A; color: #c7d6c6; background: transparent; cursor: pointer; white-space: nowrap; }
+        .filtro-tab.active { background: #00e678; border-color: #00e678; color: #003919; }
+        .modal-scrim { position: fixed; inset: 0; background: rgba(8,16,9,.7); display: flex; align-items: flex-start; justify-content: center; padding: 24px 16px; overflow-y: auto; z-index: 50; }
+        .field { width: 100%; background: #19221a; border: 1px solid #3A3A3A; border-radius: 8px; padding: 9px 12px; color: #dbe5d9; font-family: inherit; font-size: 14px; }
+        .field::placeholder { color: #7a897b; }
+        table.reportes th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7a6c; padding: 8px 12px; }
+        table.reportes td { padding: 10px 12px; font-size: 14px; border-top: 1px solid #3A3A3A; }
+        table.reportes tr:hover td { background: #232c24; }
+    </style>
+</head>
+<body class="bg-level-0 text-on-background font-sans min-h-screen flex flex-col">
+
+<nav class="bg-background border-b border-outline-variant">
+<div class="flex justify-between items-center w-full px-4 md:px-16 py-4 max-w-7xl mx-auto">
+<a href="index.html" class="flex items-center" aria-label="AutoScore, ir al inicio">
+<img src="logo.png" alt="AutoScore" class="h-8 w-auto"/>
+</a>
+<div id="nav-sesion" class="hidden items-center gap-4">
+<span id="nav-correo" class="text-sm text-on-surface-variant"></span>
+<button type="button" onclick="cerrarSesion()" class="text-sm font-bold text-on-surface-variant hover:text-primary-container transition-colors">Cerrar sesión</button>
+</div>
+</div>
+</nav>
+
+<main class="flex-grow px-4 md:px-16 py-10">
+<div class="max-w-7xl mx-auto w-full">
+
+<!-- Login -->
+<div id="vista-login" class="max-w-md mx-auto flex flex-col items-center text-center gap-3 py-16">
+<span class="text-primary-container font-bold text-xs uppercase tracking-widest">Panel interno</span>
+<h1 class="text-2xl font-bold text-on-background">Acceso de administrador</h1>
+<p class="text-on-surface-variant mb-2">Solo el correo autorizado puede entrar aquí.</p>
+
+<form id="form-correo" onsubmit="return handleEnviarCodigo(event)" class="bg-level-1 rounded-2xl p-6 w-full flex flex-col gap-4 text-left">
+<div class="flex flex-col gap-2">
+<label for="login-correo" class="text-sm font-bold text-on-surface-variant">Correo</label>
+<input id="login-correo" type="email" required class="field" placeholder="tu@correo.com"/>
+</div>
+<p id="login-error" class="hidden text-sm" style="color:#FF5252"></p>
+<button id="btn-enviar-codigo" type="submit" class="w-full bg-primary-container text-on-primary-fixed font-bold py-3 rounded-full hover:brightness-110 transition-all disabled:opacity-60">Enviar código</button>
+</form>
+
+<form id="form-codigo" onsubmit="return handleVerificarCodigo(event)" class="hidden bg-level-1 rounded-2xl p-6 w-full flex-col gap-4 text-left">
+<p class="text-sm text-on-surface-variant">Ingresa el código de 6 dígitos que enviamos a tu correo.</p>
+<div class="grid grid-cols-6 gap-2" onpaste="handlePasteOtp(event)">
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
+</div>
+<p id="codigo-error" class="hidden text-sm" style="color:#FF5252"></p>
+<button id="btn-verificar" type="submit" class="w-full bg-primary-container text-on-primary-fixed font-bold py-3 rounded-full hover:brightness-110 transition-all disabled:opacity-60">Verificar</button>
+</form>
+</div>
+
+<!-- Acceso denegado -->
+<div id="vista-denegado" class="hidden max-w-md mx-auto flex flex-col items-center text-center gap-3 py-16">
+<span class="material-symbols-outlined text-warn" style="font-size:2.5rem" aria-hidden="true">block</span>
+<h1 class="text-2xl font-bold text-on-background">Acceso denegado</h1>
+<p class="text-on-surface-variant">Ese correo no tiene permisos de administrador.</p>
+<button type="button" onclick="cerrarSesion()" class="text-primary-container font-bold">Intentar con otro correo</button>
+</div>
+
+<!-- Dashboard -->
+<div id="vista-dashboard" class="hidden flex flex-col gap-6">
+<div class="flex items-center justify-between flex-wrap gap-3">
+<h1 class="text-2xl font-bold text-on-background">Reportes</h1>
+<div id="filtros" class="flex gap-2 flex-wrap"></div>
+</div>
+
+<div class="bg-level-1 rounded-2xl overflow-x-auto">
+<table class="reportes w-full">
+<thead>
+<tr>
+<th>Reporte</th>
+<th>Vehículo</th>
+<th>Correo</th>
+<th>Status</th>
+<th>Fecha</th>
+<th></th>
+</tr>
+</thead>
+<tbody id="tabla-reportes"></tbody>
+</table>
+<p id="lista-vacia" class="hidden text-center text-on-surface-variant py-10">No hay reportes con este filtro.</p>
+</div>
+</div>
+
+</div>
+</main>
+
+<!-- Modal de edición -->
+<div id="modal-editar" class="modal-scrim hidden">
+<div class="bg-level-1 rounded-2xl p-6 w-full max-w-3xl my-8 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div>
+<h2 id="modal-titulo" class="text-xl font-bold text-on-background">Reporte</h2>
+<p id="modal-subtitulo" class="text-sm text-on-surface-variant"></p>
+</div>
+<button type="button" onclick="cerrarModal()" class="text-on-surface-variant hover:text-on-background" aria-label="Cerrar">
+<span class="material-symbols-outlined" aria-hidden="true">close</span>
+</button>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-on-surface-variant">Status</label>
+<select id="edit-status" class="field">
+<option value="borrador">Borrador</option>
+<option value="pendiente_pago">Pendiente de pago</option>
+<option value="pendiente">Pendiente</option>
+<option value="procesando">Procesando</option>
+<option value="completado">Completado</option>
+<option value="no_concluyente">No concluyente</option>
+<option value="reembolsado">Reembolsado</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-on-surface-variant">AutoScore (0-100)</label>
+<input id="edit-autoscore" type="number" min="0" max="100" class="field" placeholder="82"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-on-surface-variant">Nivel de riesgo</label>
+<select id="edit-risk" class="field">
+<option value="">Sin definir</option>
+<option value="bajo">Bajo</option>
+<option value="medio">Medio</option>
+<option value="alto">Alto</option>
+</select>
+</div>
+</div>
+
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-on-surface-variant">Recomendación (párrafo)</label>
+<textarea id="edit-recomendacion" rows="2" class="field" placeholder="La información disponible no muestra señales de alto riesgo..."></textarea>
+</div>
+
+<div class="bg-surface-container-lowest rounded-xl p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<p class="text-xs font-bold uppercase tracking-widest text-primary-container">Pegar desde Claude</p>
+<button type="button" onclick="aplicarPegadoClaude()" class="text-sm font-bold text-primary-container border border-primary-container/40 rounded-full px-4 py-1.5 hover:bg-primary-container/10">Aplicar</button>
+</div>
+<textarea id="pegado-claude" rows="4" class="field" style="font-family:'Courier New',monospace;font-size:12px;" placeholder='{"autoscore": 82, "risk_level": "bajo", "recommendation_text": "...", "findings": {...}, "validation_points": [...]}'></textarea>
+<p id="pegado-error" class="hidden text-sm" style="color:#FF5252"></p>
+</div>
+
+<div class="flex flex-col gap-3">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Hallazgos (¿qué encontramos?)</p>
+<div id="hallazgos-editor" class="flex flex-col gap-3"></div>
+</div>
+
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Puntos a validar</p>
+<button type="button" onclick="agregarPuntoValidar()" class="text-sm font-bold text-primary-container flex items-center gap-1">
+<span class="material-symbols-outlined text-base" aria-hidden="true">add</span> Agregar
+</button>
+</div>
+<div id="puntos-editor" class="flex flex-col gap-3"></div>
+</div>
+
+<div class="flex flex-col gap-2">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">PDF del reporte</p>
+<div class="flex items-center gap-3">
+<input id="edit-pdf-file" type="file" accept="application/pdf" class="field"/>
+<a id="edit-pdf-link" href="#" target="_blank" class="hidden text-sm font-bold text-primary-container whitespace-nowrap">Ver actual</a>
+</div>
+</div>
+
+<p id="modal-error" class="hidden text-sm" style="color:#FF5252"></p>
+<div class="flex justify-end gap-3">
+<button type="button" onclick="cerrarModal()" class="border border-outline-variant text-on-background font-bold px-5 py-2.5 rounded-full hover:bg-surface-container-high">Cancelar</button>
+<button id="btn-guardar" type="button" onclick="guardarReporte()" class="bg-primary-container text-on-primary-fixed font-bold px-6 py-2.5 rounded-full hover:brightness-110 disabled:opacity-60">Guardar todo</button>
+</div>
+</div>
+</div>
+
+<footer class="border-t border-outline-variant py-6 px-4 md:px-16">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-on-surface-variant">
+<p>© 2026 AutoScoreMX. Panel interno.</p>
+</div>
+</footer>
+
+<script>
+    const sb = window.supabase.createClient(
+        'https://nnlxcelrbkreffxotezo.supabase.co',
+        'sb_publishable_WRLtbtqL5VDKbUhY-tzGEw_SkEbne5j'
+    );
+
+    const ADMIN_EMAIL = 'autoscoremex@gmail.com';
+
+    const CATEGORIAS = [
+        { key: 'historial', label: 'Historial' },
+        { key: 'identidad_vehiculo', label: 'Identidad del vehículo' },
+        { key: 'precio_mercado', label: 'Precio de mercado' },
+        { key: 'analisis_imagenes', label: 'Análisis de imágenes' },
+        { key: 'inconsistencias', label: 'Inconsistencias' }
+    ];
+
+    const STATUS_LABEL = {
+        borrador: 'Borrador', pendiente_pago: 'Pendiente de pago', pendiente: 'Pendiente',
+        procesando: 'Procesando', completado: 'Completado', no_concluyente: 'No concluyente', reembolsado: 'Reembolsado'
+    };
+    const STATUS_COLOR = {
+        borrador: 'background:#3A3A3A;color:#c7d6c6', pendiente_pago: 'background:#3A3A3A;color:#c7d6c6',
+        pendiente: 'background:#332a12;color:#FFAB40', procesando: 'background:#332a12;color:#FFAB40',
+        completado: 'background:#152e20;color:#00e678', no_concluyente: 'background:#2a2a2a;color:#c7d6c6',
+        reembolsado: 'background:#2a2a2a;color:#c7d6c6'
+    };
+
+    let reportesCache = [];
+    let filtroActivo = 'todos';
+    let reporteActual = null;
+
+    function mostrarVista(nombre) {
+        ['vista-login', 'vista-denegado', 'vista-dashboard'].forEach(id => {
+            document.getElementById(id).classList.toggle('hidden', id !== nombre);
+        });
+        document.getElementById('nav-sesion').classList.toggle('hidden', nombre !== 'vista-dashboard' && nombre !== 'vista-denegado');
+    }
+
+    async function iniciar() {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+            mostrarVista('vista-login');
+            return;
+        }
+        document.getElementById('nav-correo').textContent = session.user.email;
+        if ((session.user.email || '').toLowerCase() !== ADMIN_EMAIL) {
+            mostrarVista('vista-denegado');
+            return;
+        }
+        mostrarVista('vista-dashboard');
+        await cargarReportes();
+    }
+
+    async function cerrarSesion() {
+        await sb.auth.signOut();
+        document.getElementById('form-correo').classList.remove('hidden');
+        document.getElementById('form-codigo').classList.add('hidden');
+        document.getElementById('login-correo').value = '';
+        mostrarVista('vista-login');
+    }
+
+    // --- Login ---
+    async function handleEnviarCodigo(event) {
+        event.preventDefault();
+        const correo = document.getElementById('login-correo').value.trim();
+        const errorEl = document.getElementById('login-error');
+        errorEl.classList.add('hidden');
+        const boton = document.getElementById('btn-enviar-codigo');
+        boton.disabled = true;
+
+        const { error } = await sb.auth.signInWithOtp({ email: correo });
+
+        boton.disabled = false;
+        if (error) {
+            errorEl.textContent = 'No pudimos enviar el código. Inténtalo de nuevo.';
+            errorEl.classList.remove('hidden');
+            return false;
+        }
+        sessionStorage.setItem('admin_correo', correo);
+        document.getElementById('form-correo').classList.add('hidden');
+        document.getElementById('form-codigo').classList.remove('hidden');
+        return false;
+    }
+
+    async function handleVerificarCodigo(event) {
+        event.preventDefault();
+        const correo = sessionStorage.getItem('admin_correo');
+        const boxes = document.querySelectorAll('#form-codigo .otp-box');
+        const token = Array.from(boxes).map(b => b.value).join('');
+        const errorEl = document.getElementById('codigo-error');
+        errorEl.classList.add('hidden');
+        if (token.length !== 6) return false;
+
+        const boton = document.getElementById('btn-verificar');
+        boton.disabled = true;
+        const { error } = await sb.auth.verifyOtp({ email: correo, token, type: 'email' });
+        boton.disabled = false;
+
+        if (error) {
+            errorEl.textContent = 'Código incorrecto o expirado.';
+            errorEl.classList.remove('hidden');
+            return false;
+        }
+        await iniciar();
+        return false;
+    }
+
+    function autoAdvanceOtp(input) {
+        input.value = input.value.replace(/[^0-9]/g, '');
+        if (input.value.length === 1 && input.nextElementSibling) input.nextElementSibling.focus();
+    }
+    function handlePasteOtp(event) {
+        const text = (event.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+        const boxes = event.currentTarget.querySelectorAll('.otp-box');
+        text.split('').slice(0, 6).forEach((c, i) => { if (boxes[i]) boxes[i].value = c; });
+        event.preventDefault();
+    }
+
+    // --- Dashboard ---
+    async function cargarReportes() {
+        const { data, error } = await sb.from('reports')
+            .select('id, status, autoscore, risk_level, recommendation_text, report_pdf_url, email, created_at, vehicles ( marca, modelo, anio )')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+        reportesCache = data || [];
+        renderizarFiltros();
+        renderizarTabla();
+    }
+
+    function renderizarFiltros() {
+        const cont = document.getElementById('filtros');
+        const opciones = [['todos', 'Todos']].concat(Object.entries(STATUS_LABEL));
+        cont.innerHTML = '';
+        opciones.forEach(([valor, label]) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'filtro-tab' + (valor === filtroActivo ? ' active' : '');
+            btn.textContent = label;
+            btn.onclick = () => { filtroActivo = valor; renderizarFiltros(); renderizarTabla(); };
+            cont.appendChild(btn);
+        });
+    }
+
+    function renderizarTabla() {
+        const tbody = document.getElementById('tabla-reportes');
+        const vacio = document.getElementById('lista-vacia');
+        const lista = filtroActivo === 'todos' ? reportesCache : reportesCache.filter(r => r.status === filtroActivo);
+
+        tbody.innerHTML = '';
+        vacio.classList.toggle('hidden', lista.length > 0);
+
+        lista.forEach(r => {
+            const tr = document.createElement('tr');
+            const vehiculo = r.vehicles ? [r.vehicles.marca, r.vehicles.modelo, r.vehicles.anio].filter(Boolean).join(' ') : '—';
+            const fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+            tr.innerHTML =
+                '<td class="font-bold">' + r.id + '</td>' +
+                '<td>' + vehiculo + '</td>' +
+                '<td class="text-on-surface-variant">' + r.email + '</td>' +
+                '<td><span class="status-badge" style="' + (STATUS_COLOR[r.status] || '') + '">' + (STATUS_LABEL[r.status] || r.status) + '</span></td>' +
+                '<td class="text-on-surface-variant">' + fecha + '</td>' +
+                '<td></td>';
+            const tdBoton = tr.lastElementChild;
+            const boton = document.createElement('button');
+            boton.type = 'button';
+            boton.className = 'text-sm font-bold text-primary-container border border-outline-variant rounded-full px-4 py-1.5 hover:bg-surface-container-high';
+            boton.textContent = 'Editar';
+            boton.onclick = () => abrirModal(r.id);
+            tdBoton.appendChild(boton);
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- Modal de edición ---
+    function renderizarHallazgosEditor(datos) {
+        const cont = document.getElementById('hallazgos-editor');
+        cont.innerHTML = '';
+        CATEGORIAS.forEach(cat => {
+            const dato = (datos || []).find(d => d.category === cat.key) || {};
+            const fila = document.createElement('div');
+            fila.className = 'grid grid-cols-1 sm:grid-cols-[180px_140px_1fr] gap-2 items-center';
+            fila.dataset.categoria = cat.key;
+            fila.innerHTML =
+                '<span class="text-sm font-bold">' + cat.label + '</span>' +
+                '<select class="field cat-status">' +
+                    '<option value="ok">OK</option>' +
+                    '<option value="advertencia">Advertencia</option>' +
+                    '<option value="sin_datos">Sin datos</option>' +
+                '</select>' +
+                '<input type="text" class="field cat-detail" placeholder="Texto corto para el cliente"/>';
+            fila.querySelector('.cat-status').value = dato.status || 'ok';
+            fila.querySelector('.cat-detail').value = dato.detail || '';
+            cont.appendChild(fila);
+        });
+    }
+
+    function filaPuntoValidar(punto) {
+        const fila = document.createElement('div');
+        fila.className = 'flex gap-2 items-start bg-surface-container-lowest rounded-lg p-3';
+        fila.innerHTML =
+            '<div class="flex-1 flex flex-col gap-2">' +
+                '<input type="text" class="field punto-titulo" placeholder="Título (ej. Kilometraje)"/>' +
+                '<input type="text" class="field punto-descripcion" placeholder="Descripción para el cliente"/>' +
+            '</div>' +
+            '<button type="button" class="text-on-surface-variant hover:text-on-background mt-1" aria-label="Quitar">' +
+                '<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
+            '</button>';
+        fila.querySelector('.punto-titulo').value = (punto && punto.titulo) || '';
+        fila.querySelector('.punto-descripcion').value = (punto && punto.descripcion) || '';
+        fila.querySelector('button').onclick = () => fila.remove();
+        return fila;
+    }
+
+    function agregarPuntoValidar(punto) {
+        document.getElementById('puntos-editor').appendChild(filaPuntoValidar(punto));
+    }
+
+    async function abrirModal(reportId) {
+        const reporte = reportesCache.find(r => r.id === reportId);
+        if (!reporte) return;
+        reporteActual = reporte;
+
+        document.getElementById('modal-error').classList.add('hidden');
+        document.getElementById('pegado-error').classList.add('hidden');
+        document.getElementById('pegado-claude').value = '';
+
+        const vehiculo = reporte.vehicles ? [reporte.vehicles.marca, reporte.vehicles.modelo, reporte.vehicles.anio].filter(Boolean).join(' ') : '—';
+        document.getElementById('modal-titulo').textContent = 'Reporte ' + reporte.id;
+        document.getElementById('modal-subtitulo').textContent = vehiculo + ' · ' + reporte.email;
+
+        document.getElementById('edit-status').value = reporte.status;
+        document.getElementById('edit-autoscore').value = reporte.autoscore ?? '';
+        document.getElementById('edit-risk').value = reporte.risk_level || '';
+        document.getElementById('edit-recomendacion').value = reporte.recommendation_text || '';
+
+        const pdfLink = document.getElementById('edit-pdf-link');
+        document.getElementById('edit-pdf-file').value = '';
+        if (reporte.report_pdf_url) {
+            pdfLink.href = reporte.report_pdf_url;
+            pdfLink.classList.remove('hidden');
+        } else {
+            pdfLink.classList.add('hidden');
+        }
+
+        const [{ data: findings }, { data: puntos }] = await Promise.all([
+            sb.from('report_findings').select('category, status, detail').eq('report_id', reportId),
+            sb.from('report_validation_points').select('titulo, descripcion, orden').eq('report_id', reportId).order('orden')
+        ]);
+
+        renderizarHallazgosEditor(findings);
+        document.getElementById('puntos-editor').innerHTML = '';
+        (puntos || []).forEach(p => agregarPuntoValidar(p));
+
+        document.getElementById('modal-editar').classList.remove('hidden');
+    }
+
+    function cerrarModal() {
+        document.getElementById('modal-editar').classList.add('hidden');
+        reporteActual = null;
+    }
+
+    function aplicarPegadoClaude() {
+        const texto = document.getElementById('pegado-claude').value.trim();
+        const errorEl = document.getElementById('pegado-error');
+        errorEl.classList.add('hidden');
+        if (!texto) return;
+
+        let datos;
+        try {
+            datos = JSON.parse(texto);
+        } catch (e) {
+            errorEl.textContent = 'Ese texto no es un JSON válido. Revisa el formato.';
+            errorEl.classList.remove('hidden');
+            return;
+        }
+
+        if (typeof datos.autoscore === 'number') document.getElementById('edit-autoscore').value = datos.autoscore;
+        if (datos.risk_level) document.getElementById('edit-risk').value = datos.risk_level;
+        if (datos.recommendation_text) document.getElementById('edit-recomendacion').value = datos.recommendation_text;
+
+        if (datos.findings) {
+            document.querySelectorAll('#hallazgos-editor > div').forEach(fila => {
+                const cat = fila.dataset.categoria;
+                const dato = datos.findings[cat];
+                if (dato) {
+                    if (dato.status) fila.querySelector('.cat-status').value = dato.status;
+                    if (dato.detail) fila.querySelector('.cat-detail').value = dato.detail;
+                }
+            });
+        }
+
+        if (Array.isArray(datos.validation_points)) {
+            document.getElementById('puntos-editor').innerHTML = '';
+            datos.validation_points.forEach(p => agregarPuntoValidar(p));
+        }
+    }
+
+    async function guardarReporte() {
+        if (!reporteActual) return;
+        const errorEl = document.getElementById('modal-error');
+        errorEl.classList.add('hidden');
+
+        const boton = document.getElementById('btn-guardar');
+        boton.disabled = true;
+        boton.textContent = 'Guardando...';
+
+        try {
+            const status = document.getElementById('edit-status').value;
+            const autoscoreVal = document.getElementById('edit-autoscore').value;
+            const datosReporte = {
+                status: status,
+                autoscore: autoscoreVal === '' ? null : parseInt(autoscoreVal, 10),
+                risk_level: document.getElementById('edit-risk').value || null,
+                recommendation_text: document.getElementById('edit-recomendacion').value.trim() || null
+            };
+            if (status === 'completado') {
+                datosReporte.analysis_completed_at = new Date().toISOString();
+            }
+
+            // PDF: si eligieron un archivo nuevo, se sube antes de guardar.
+            const pdfInput = document.getElementById('edit-pdf-file');
+            if (pdfInput.files && pdfInput.files[0]) {
+                const ruta = reporteActual.id + '.pdf';
+                const { error: uploadError } = await sb.storage.from('report-pdfs').upload(ruta, pdfInput.files[0], { upsert: true, contentType: 'application/pdf' });
+                if (uploadError) throw new Error('No se pudo subir el PDF: ' + uploadError.message);
+                const { data: urlData } = sb.storage.from('report-pdfs').getPublicUrl(ruta);
+                datosReporte.report_pdf_url = urlData.publicUrl;
+            }
+
+            const { error: reportError } = await sb.from('reports').update(datosReporte).eq('id', reporteActual.id);
+            if (reportError) throw new Error('No se pudo guardar el reporte: ' + reportError.message);
+
+            const filasHallazgos = Array.from(document.querySelectorAll('#hallazgos-editor > div')).map(fila => ({
+                report_id: reporteActual.id,
+                category: fila.dataset.categoria,
+                status: fila.querySelector('.cat-status').value,
+                detail: fila.querySelector('.cat-detail').value.trim() || 'Pendiente de revisión'
+            }));
+            const { error: findingsError } = await sb.from('report_findings')
+                .upsert(filasHallazgos, { onConflict: 'report_id,category' });
+            if (findingsError) throw new Error('No se pudieron guardar los hallazgos: ' + findingsError.message);
+
+            const puntos = Array.from(document.querySelectorAll('#puntos-editor > div')).map((fila, i) => ({
+                report_id: reporteActual.id,
+                titulo: fila.querySelector('.punto-titulo').value.trim(),
+                descripcion: fila.querySelector('.punto-descripcion').value.trim(),
+                orden: i + 1
+            })).filter(p => p.titulo || p.descripcion);
+
+            const { error: deleteError } = await sb.from('report_validation_points').delete().eq('report_id', reporteActual.id);
+            if (deleteError) throw new Error('No se pudieron actualizar los puntos a validar: ' + deleteError.message);
+
+            if (puntos.length > 0) {
+                const { error: insertError } = await sb.from('report_validation_points').insert(puntos);
+                if (insertError) throw new Error('No se pudieron guardar los puntos a validar: ' + insertError.message);
+            }
+
+            cerrarModal();
+            await cargarReportes();
+        } catch (err) {
+            errorEl.textContent = err.message || 'Algo salió mal. Inténtalo de nuevo.';
+            errorEl.classList.remove('hidden');
+        } finally {
+            boton.disabled = false;
+            boton.textContent = 'Guardar todo';
+        }
+    }
+
+    iniciar();
+</script>
+</body>
+</html>
