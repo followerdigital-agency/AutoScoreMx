@@ -60,6 +60,18 @@
         table.reportes th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7a6c; padding: 8px 12px; }
         table.reportes td { padding: 10px 12px; font-size: 14px; border-top: 1px solid #3A3A3A; }
         table.reportes tr:hover td { background: #232c24; }
+        /* Contraste: estas reglas deben ganar a los estilos base del plugin de formularios de Tailwind. */
+        input.otp-box { background-color: #101a12; color: #f0f5ef; border: 1px solid #7d9181; border-radius: 10px; padding: 0; font-size: 1.5rem; }
+        input.otp-box:focus { border-color: #00e678; box-shadow: none; outline: 2px solid #00e678; outline-offset: 2px; }
+        input.field, select.field, textarea.field { background-color: #101a12; color: #f0f5ef; border: 1px solid #7d9181; border-radius: 8px; padding: 9px 12px; font-size: 14px; color-scheme: dark; }
+        select.field { padding-right: 2.5rem; }
+        input.field:hover, select.field:hover, textarea.field:hover { border-color: #b4c7b7; }
+        input.field:focus, select.field:focus, textarea.field:focus { border-color: #00e678; box-shadow: none; outline: 2px solid #00e678; outline-offset: 2px; }
+        .field::placeholder { color: #9cae9f; opacity: 1; }
+        textarea#pegado-claude.field { font-size: 12px; }
+        input.field[type="file"] { padding: 6px; cursor: pointer; }
+        .field::file-selector-button { background: transparent; color: #00e678; border: 1px solid #00e678; border-radius: 999px; padding: 4px 12px; margin-right: 10px; font-weight: 700; cursor: pointer; }
+        table.reportes th { color: #9cae9f; }
     </style>
 </head>
 <body class="bg-level-0 text-on-background font-sans min-h-screen flex flex-col">
@@ -97,12 +109,12 @@
 <form id="form-codigo" onsubmit="return handleVerificarCodigo(event)" class="hidden bg-level-1 rounded-2xl p-6 w-full flex-col gap-4 text-left">
 <p class="text-sm text-on-surface-variant">Ingresa el código de 6 dígitos que enviamos a tu correo.</p>
 <div class="grid grid-cols-6 gap-2" onpaste="handlePasteOtp(event)">
-<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
-<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
-<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
-<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
-<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
-<input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" aria-label="Dígito 1 de 6" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" aria-label="Dígito 2 de 6" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" aria-label="Dígito 3 de 6" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" aria-label="Dígito 4 de 6" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" aria-label="Dígito 5 de 6" oninput="autoAdvanceOtp(this)" required/>
+<input type="text" inputmode="numeric" maxlength="1" class="otp-box" aria-label="Dígito 6 de 6" oninput="autoAdvanceOtp(this)" required/>
 </div>
 <p id="codigo-error" class="hidden text-sm" style="color:#FF5252"></p>
 <button id="btn-verificar" type="submit" class="w-full bg-primary-container text-on-primary-fixed font-bold py-3 rounded-full hover:brightness-110 transition-all disabled:opacity-60">Verificar</button>
@@ -160,7 +172,7 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 <div class="flex flex-col gap-2">
-<label class="text-sm font-bold text-on-surface-variant">Status</label>
+<label for="edit-status" class="text-sm font-bold text-on-surface-variant">Status</label>
 <select id="edit-status" class="field">
 <option value="borrador">Borrador</option>
 <option value="pendiente_pago">Pendiente de pago</option>
@@ -172,11 +184,11 @@
 </select>
 </div>
 <div class="flex flex-col gap-2">
-<label class="text-sm font-bold text-on-surface-variant">AutoScore (0-100)</label>
+<label for="edit-autoscore" class="text-sm font-bold text-on-surface-variant">AutoScore (0-100)</label>
 <input id="edit-autoscore" type="number" min="0" max="100" class="field" placeholder="82"/>
 </div>
 <div class="flex flex-col gap-2">
-<label class="text-sm font-bold text-on-surface-variant">Nivel de riesgo</label>
+<label for="edit-risk" class="text-sm font-bold text-on-surface-variant">Nivel de riesgo</label>
 <select id="edit-risk" class="field">
 <option value="">Sin definir</option>
 <option value="bajo">Bajo</option>
@@ -187,7 +199,7 @@
 </div>
 
 <div class="flex flex-col gap-2">
-<label class="text-sm font-bold text-on-surface-variant">Recomendación (párrafo)</label>
+<label for="edit-recomendacion" class="text-sm font-bold text-on-surface-variant">Recomendación (párrafo)</label>
 <textarea id="edit-recomendacion" rows="2" class="field" placeholder="La información disponible no muestra señales de alto riesgo..."></textarea>
 </div>
 
@@ -196,7 +208,7 @@
 <p class="text-xs font-bold uppercase tracking-widest text-primary-container">Pegar desde Claude</p>
 <button type="button" onclick="aplicarPegadoClaude()" class="text-sm font-bold text-primary-container border border-primary-container/40 rounded-full px-4 py-1.5 hover:bg-primary-container/10">Aplicar</button>
 </div>
-<textarea id="pegado-claude" rows="4" class="field" style="font-family:'Courier New',monospace;font-size:12px;" placeholder='{"autoscore": 82, "risk_level": "bajo", "recommendation_text": "...", "findings": {...}, "validation_points": [...]}'></textarea>
+<textarea id="pegado-claude" aria-label="Texto del análisis para pegar" rows="4" class="field" style="font-family:'Courier New',monospace;font-size:12px;" placeholder='{"autoscore": 82, "risk_level": "bajo", "recommendation_text": "...", "findings": {...}, "validation_points": [...]}'></textarea>
 <p id="pegado-error" class="hidden text-sm" style="color:#FF5252"></p>
 </div>
 
@@ -218,7 +230,7 @@
 <div class="flex flex-col gap-2">
 <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">PDF del reporte</p>
 <div class="flex items-center gap-3">
-<input id="edit-pdf-file" type="file" accept="application/pdf" class="field"/>
+<input id="edit-pdf-file" aria-label="Archivo PDF del reporte" type="file" accept="application/pdf" class="field"/>
 <a id="edit-pdf-link" href="#" target="_blank" class="hidden text-sm font-bold text-primary-container whitespace-nowrap">Ver actual</a>
 </div>
 </div>
@@ -442,6 +454,8 @@
                     '<option value="sin_datos">Sin datos</option>' +
                 '</select>' +
                 '<input type="text" class="field cat-detail" placeholder="Texto corto para el cliente"/>';
+            fila.querySelector('.cat-status').setAttribute('aria-label', 'Estado: ' + cat.label);
+            fila.querySelector('.cat-detail').setAttribute('aria-label', 'Detalle: ' + cat.label);
             fila.querySelector('.cat-status').value = dato.status || 'ok';
             fila.querySelector('.cat-detail').value = dato.detail || '';
             cont.appendChild(fila);
@@ -453,8 +467,8 @@
         fila.className = 'flex gap-2 items-start bg-surface-container-lowest rounded-lg p-3';
         fila.innerHTML =
             '<div class="flex-1 flex flex-col gap-2">' +
-                '<input type="text" class="field punto-titulo" placeholder="Título (ej. Kilometraje)"/>' +
-                '<input type="text" class="field punto-descripcion" placeholder="Descripción para el cliente"/>' +
+                '<input type="text" class="field punto-titulo" aria-label="Título del punto a validar" placeholder="Título (ej. Kilometraje)"/>' +
+                '<input type="text" class="field punto-descripcion" aria-label="Descripción del punto a validar" placeholder="Descripción para el cliente"/>' +
             '</div>' +
             '<button type="button" class="text-on-surface-variant hover:text-on-background mt-1" aria-label="Quitar">' +
                 '<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
