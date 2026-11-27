@@ -331,7 +331,8 @@
     }
 
     async function handlePagar() {
-        const correo = document.getElementById('correo').value.trim();
+        // En minúsculas: así lo maneja el acceso por código y así se busca el reporte.
+        const correo = document.getElementById('correo').value.trim().toLowerCase();
         const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
         const errorMsg = document.getElementById('correo-error');
         const reporteError = document.getElementById('reporte-error');
@@ -375,6 +376,8 @@
         sessionStorage.setItem('as_solicitud', JSON.stringify({
             folio: folio, correo: correo, vehiculo: vehiculoNombre, fecha: new Date().toISOString()
         }));
+        // Solicitud enviada: la siguiente captura en esta pestaña crea un auto nuevo.
+        sessionStorage.removeItem('as_vehicle_id');
         window.location.href = '03-5-analisis-en-proceso.html';
     }
 

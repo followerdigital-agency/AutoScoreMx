@@ -130,7 +130,7 @@
 
     async function handleBuscar(event) {
         event.preventDefault();
-        const correo = document.getElementById('correo').value.trim();
+        const correo = document.getElementById('correo').value.trim().toLowerCase();
         if (!correo) return false;
 
         document.getElementById('sin-reportes').classList.add('hidden');
