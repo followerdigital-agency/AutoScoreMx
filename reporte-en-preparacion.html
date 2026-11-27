@@ -171,7 +171,8 @@
 
     (async function cargar() {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) {
+        // La sesión anónima del formulario no da acceso a reportes: hace falta verificar el correo.
+        if (!session || session.user.is_anonymous) {
             window.location.href = 'consultar-reporte.html';
             return;
         }

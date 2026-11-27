@@ -292,7 +292,7 @@
 
     async function iniciar() {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) {
+        if (!session || session.user.is_anonymous) {
             mostrarVista('vista-login');
             return;
         }

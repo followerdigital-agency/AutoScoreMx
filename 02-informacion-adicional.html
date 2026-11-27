@@ -470,13 +470,20 @@
         boton.disabled = true;
         document.getElementById('btn-continuar-texto').textContent = 'Guardando...';
 
-        const { error } = await sb.from('vehicles').update(datos).eq('id', vehicleId);
+        const { data: actualizados, error } = await sb.from('vehicles').update(datos).eq('id', vehicleId).select('id');
 
         boton.disabled = false;
         document.getElementById('btn-continuar-texto').textContent = 'Continuar';
 
         if (error) {
             errorGuardar.classList.remove('hidden');
+            return;
+        }
+
+        // Ninguna fila: el auto ya no pertenece a esta sesión, hay que capturarlo de nuevo.
+        if (!actualizados || actualizados.length === 0) {
+            sessionStorage.removeItem('as_vehicle_id');
+            window.location.href = '01-datos-auto.html';
             return;
         }
 

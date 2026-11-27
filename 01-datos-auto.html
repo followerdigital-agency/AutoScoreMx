@@ -226,6 +226,13 @@
         updatePreview();
     })();
 
+    // Cada visitante recibe una sesión anónima: así solo puede ver y cambiar su propio auto.
+    // Se crea al guardar, no al visitar la página. Si falla, la base decide si permite guardar.
+    async function asegurarSesion() {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) await sb.auth.signInAnonymously();
+    }
+
     async function handleSubmit(event) {
         event.preventDefault();
         const marca = document.getElementById('marca').value.trim();
@@ -248,10 +255,14 @@
         const datos = { marca, modelo, anio: parseInt(anio, 10), lugar_compra: lugarSeleccionado };
         const vehicleIdExistente = sessionStorage.getItem('as_vehicle_id');
 
+        await asegurarSesion();
+
         let resultado;
         if (vehicleIdExistente) {
             resultado = await sb.from('vehicles').update(datos).eq('id', vehicleIdExistente).select().single();
-        } else {
+        }
+        // Sin auto previo, o si ya no pertenece a esta sesión (PGRST116: ninguna fila), se crea uno nuevo.
+        if (!vehicleIdExistente || (resultado.error && resultado.error.code === 'PGRST116')) {
             resultado = await sb.from('vehicles').insert(datos).select().single();
         }
 
