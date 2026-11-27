@@ -62,6 +62,13 @@
         .photo-slot:hover { border-color: #00e678; }
         .photo-slot.filled { border-style: solid; border-color: #00e678; background: #152e20; }
         .photo-status { margin-top: -2px; }
+        .photo-slot.filled:not(.uploading)::after { content: 'Toca para cambiar'; font-size: 11px; color: #c7d6c6; text-decoration: underline; }
+        .photo-slot.uploading { cursor: progress; }
+        .photo-slot.uploading .photo-icon { display: inline-block; animation: girar 1s linear infinite; }
+        @keyframes girar { to { transform: rotate(360deg); } }
+        .photo-preview { display: none; width: 100%; height: 72px; object-fit: cover; border-radius: 8px; }
+        .photo-slot.con-miniatura:not(.uploading) .photo-preview { display: block; }
+        .photo-slot.con-miniatura:not(.uploading) .photo-icon { display: none; }
         .cat-pending { color: #6b7a6c; }
         .cat-done { color: #00e678; }
     </style>
@@ -185,37 +192,37 @@
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'tablero')"/>
 <span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">speed</span>
 <span class="text-xs text-on-surface-variant">Tablero</span>
-<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="tablero">✓ Cargado</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="tablero">✓ Foto cargada</span>
 </label>
 <label class="photo-slot" data-slot="niv">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'niv')"/>
 <span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">qr_code_2</span>
 <span class="text-xs text-on-surface-variant">NIV / Placa</span>
-<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="niv">✓ Cargado</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="niv">✓ Foto cargada</span>
 </label>
 <label class="photo-slot" data-slot="ext-frente">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-frente')"/>
 <span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">directions_car</span>
 <span class="text-xs text-on-surface-variant">Exterior — Frente</span>
-<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-frente">✓ Cargado</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-frente">✓ Foto cargada</span>
 </label>
 <label class="photo-slot" data-slot="ext-izq">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-izq')"/>
 <span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">directions_car</span>
 <span class="text-xs text-on-surface-variant">Exterior — Lado izq.</span>
-<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-izq">✓ Cargado</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-izq">✓ Foto cargada</span>
 </label>
 <label class="photo-slot" data-slot="ext-der">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-der')"/>
 <span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">directions_car</span>
 <span class="text-xs text-on-surface-variant">Exterior — Lado der.</span>
-<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-der">✓ Cargado</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-der">✓ Foto cargada</span>
 </label>
 <label class="photo-slot" data-slot="ext-trasera">
 <input type="file" accept="image/*" class="hidden" onchange="fotoSubida(this,'ext-trasera')"/>
 <span class="material-symbols-outlined text-primary-container photo-icon" aria-hidden="true">directions_car</span>
 <span class="text-xs text-on-surface-variant">Exterior — Trasera</span>
-<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-trasera">✓ Cargado</span>
+<span class="photo-status text-[11px] font-bold text-primary-container hidden" data-status-for="ext-trasera">✓ Foto cargada</span>
 </label>
 </div>
 <p class="text-xs text-on-surface-variant">Entre más fotos agregues, más preciso será el cruce de información de tu análisis.</p>
@@ -317,15 +324,35 @@
     };
     let fotosCargadas = [];
 
-    function marcarSlotLleno(slot) {
+    function marcarSlotLleno(slot, mensaje = '✓ Foto cargada') {
         const label = document.querySelector('.photo-slot[data-slot="' + slot + '"]');
+        // El estado visual se actualiza siempre, también al reemplazar una foto.
+        label.querySelector('.photo-icon').textContent = 'check_circle';
+        const estado = label.querySelector('.photo-status');
+        estado.textContent = mensaje;
+        estado.classList.remove('hidden');
         if (label.classList.contains('filled')) return;
         fotosSubidas++;
         fotosCargadas.push(slot);
         label.classList.add('filled');
-        label.querySelector('.photo-icon').textContent = 'check_circle';
-        label.querySelector('.photo-status').classList.remove('hidden');
         document.getElementById('foto-counter').textContent = fotosSubidas + '/' + TOTAL_FOTOS;
+    }
+
+    // Muestra la foto recién subida. Si el navegador no puede dibujarla (HEIC), queda el ícono.
+    function mostrarMiniatura(label, file) {
+        let imagen = label.querySelector('.photo-preview');
+        if (!imagen) {
+            imagen = document.createElement('img');
+            imagen.className = 'photo-preview';
+            label.insertBefore(imagen, label.querySelector('.photo-icon'));
+        } else {
+            URL.revokeObjectURL(imagen.src);
+        }
+        imagen.alt = 'Foto cargada: ' + nombresSlots[label.dataset.slot];
+        imagen.onload = () => label.classList.add('con-miniatura');
+        imagen.onerror = () => label.classList.remove('con-miniatura');
+        label.classList.remove('con-miniatura');
+        imagen.src = URL.createObjectURL(file);
     }
 
     async function fotoSubida(input, slot) {
@@ -333,44 +360,50 @@
         const file = input.files[0];
         const label = input.closest('.photo-slot');
         const icono = label.querySelector('.photo-icon');
-        const iconoOriginal = icono.textContent;
+        const estado = label.querySelector('.photo-status');
+        const yaTenia = label.classList.contains('filled');
+        const antes = { icono: icono.textContent, estado: estado.textContent, oculto: estado.classList.contains('hidden') };
         const errorEl = document.getElementById('foto-error');
         errorEl.classList.add('hidden');
 
+        input.disabled = true;
+        label.classList.add('uploading');
         icono.textContent = 'progress_activity';
+        estado.textContent = yaTenia ? 'Reemplazando…' : 'Subiendo…';
+        estado.classList.remove('hidden');
 
         const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
         const ruta = vehicleId + '/' + slot + '.' + ext;
 
-        const { error: uploadError } = await sb.storage.from('vehicle-photos').upload(ruta, file, { upsert: true });
-        if (uploadError) {
-            icono.textContent = iconoOriginal;
+        let fallo = true;
+        try {
+            const { error: uploadError } = await sb.storage.from('vehicle-photos').upload(ruta, file, { upsert: true });
+            if (!uploadError) {
+                const { error: dbError } = await sb.from('vehicle_photos')
+                    .upsert({ vehicle_id: vehicleId, slot: slot, storage_path: ruta }, { onConflict: 'vehicle_id,slot' });
+                fallo = Boolean(dbError);
+            }
+        } catch (err) {
+            console.error('Error al subir la foto', err);
+        }
+
+        label.classList.remove('uploading');
+        input.disabled = false;
+        input.value = ''; // permite volver a elegir el mismo archivo
+
+        if (fallo) {
+            // Se conserva lo que había antes en el recuadro.
+            icono.textContent = antes.icono;
+            estado.textContent = antes.estado;
+            estado.classList.toggle('hidden', antes.oculto);
             errorEl.classList.remove('hidden');
-            input.value = '';
             return;
         }
 
-        const { error: dbError } = await sb.from('vehicle_photos')
-            .upsert({ vehicle_id: vehicleId, slot: slot, storage_path: ruta }, { onConflict: 'vehicle_id,slot' });
-        if (dbError) {
-            icono.textContent = iconoOriginal;
-            errorEl.classList.remove('hidden');
-            input.value = '';
-            return;
-        }
-
-        marcarSlotLleno(slot);
+        mostrarMiniatura(label, file);
+        marcarSlotLleno(slot, yaTenia ? '✓ Foto reemplazada' : '✓ Foto cargada');
         actualizarChecks();
     }
-
-    const iconosOriginales = {
-        'tablero': 'speed',
-        'niv': 'qr_code_2',
-        'ext-frente': 'directions_car',
-        'ext-izq': 'directions_car',
-        'ext-der': 'directions_car',
-        'ext-trasera': 'directions_car'
-    };
 
     function marcarCheck(iconId, done) {
         const icon = document.getElementById(iconId);
