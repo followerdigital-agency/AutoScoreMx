@@ -235,13 +235,35 @@
             body > a.fixed { width: 48px; height: 48px; right: 16px; bottom: 16px; }
         }
 
-        /* Menú móvil */
-        #mobile-menu {
-            display: none;
+        /* Menú móvil: panel lateral derecho */
+        #mobile-menu { position: fixed; inset: 0; z-index: 60; visibility: hidden; transition: visibility 0s linear .25s; }
+        #mobile-menu.open { visibility: visible; transition-delay: 0s; }
+        #mobile-menu-fondo { position: absolute; inset: 0; background: rgba(0, 0, 0, .72); opacity: 0; transition: opacity .25s ease; touch-action: none; }
+        #mobile-menu.open #mobile-menu-fondo { opacity: 1; }
+        #mobile-menu-panel {
+            position: absolute; top: 0; right: 0; bottom: 0; width: 85%; max-width: 340px;
+            display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain;
+            background: #0d150e; border-left: 1px solid #3b4a3d;
+            padding: 12px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+            transform: translateX(100%); transition: transform .25s ease;
         }
-        #mobile-menu.open {
-            display: flex;
-        }
+        #mobile-menu.open #mobile-menu-panel { transform: none; }
+        .mm-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #3b4a3d; }
+        .mm-cabecera img { height: 36px; width: auto; }
+        #mobile-menu-cerrar { flex: none; width: 44px; height: 44px; border-radius: 50%; background: #19221a; color: #dbe5d9; display: flex; align-items: center; justify-content: center; }
+        .mm-secciones { display: flex; flex-direction: column; gap: 4px; padding: 16px 0; }
+        .mm-secciones a { display: flex; align-items: center; gap: 14px; min-height: 56px; padding: 8px 10px; border-radius: 16px; color: #dbe5d9; font-size: 15px; font-weight: 600; }
+        .mm-secciones a:active, .mm-secciones a[aria-current] { background: #19221a; }
+        .mm-secciones a[aria-current] { color: #00e678; }
+        .mm-icono { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #152e20; color: #00e678; display: flex; align-items: center; justify-content: center; }
+        .mm-acciones { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 12px; }
+        .mm-acciones a { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 16px; font-size: 15px; font-weight: 700; border: 1px solid #3b4a3d; color: #dbe5d9; }
+        .mm-acciones a.mm-principal { background: #00e678; border-color: #00e678; color: #00210c; }
+        #mobile-menu a:focus-visible, #mobile-menu button:focus-visible, #mobile-menu-toggle:focus-visible { outline: 2px solid #00e678; outline-offset: 2px; }
+        html.menu-abierto { overflow: hidden; }
+        html.menu-abierto body > a.fixed { display: none; }
+        @media (min-width: 768px) { #mobile-menu { display: none; } }
+        @media (prefers-reduced-motion: reduce) { #mobile-menu, #mobile-menu-fondo, #mobile-menu-panel { transition: none; } }
 
         /* Chips de selección única (Lugar de compra) */
         .lugar-chip {
@@ -287,21 +309,34 @@
 <a href="01-datos-auto.html" class="bg-primary-container text-on-primary-fixed font-label-bold px-6 py-2.5 rounded-full hover:bg-primary transition-colors glow-primary-hover flex items-center gap-2">
                     Analizar mi auto
                 </a>
-<button id="mobile-menu-toggle" class="md:hidden text-on-background" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="mobile-menu">
+<button id="mobile-menu-toggle" type="button" class="md:hidden flex items-center justify-center w-11 h-11 -mr-2 text-on-background" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="mobile-menu">
 <span class="material-symbols-outlined" aria-hidden="true">menu</span>
 </button>
 </div>
 </div>
-<!-- Menú móvil desplegable -->
-<div id="mobile-menu" class="md:hidden flex-col gap-1 border-t border-outline-variant bg-background px-margin-mobile py-4">
-<a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="#como-funciona">Cómo funciona</a>
-<a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="#que-analizamos">Qué analizamos</a>
-<a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="#precio">Precio</a>
-<a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="#preguntas">Preguntas</a>
-<a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="#contacto">Contacto y soporte</a>
-<a class="text-on-surface-variant font-label-bold hover:text-primary py-3" href="consultar-reporte.html">Consultar mi reporte</a>
-</div>
 </nav>
+
+<!-- Menú móvil: panel lateral -->
+<div id="mobile-menu">
+<div id="mobile-menu-fondo"></div>
+<div id="mobile-menu-panel" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+<div class="mm-cabecera">
+<img src="logo.png" alt="AutoScore"/>
+<button id="mobile-menu-cerrar" type="button" aria-label="Cerrar menú"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+</div>
+<div class="mm-secciones">
+<a href="#que-analizamos"><span class="mm-icono"><span class="material-symbols-outlined" aria-hidden="true">search</span></span>Qué analizamos</a>
+<a href="#como-funciona"><span class="mm-icono"><span class="material-symbols-outlined" aria-hidden="true">route</span></span>Cómo funciona</a>
+<a href="#precio"><span class="mm-icono"><span class="material-symbols-outlined" aria-hidden="true">sell</span></span>Precio</a>
+<a href="#preguntas"><span class="mm-icono"><span class="material-symbols-outlined" aria-hidden="true">help</span></span>Preguntas</a>
+<a href="#contacto"><span class="mm-icono"><span class="material-symbols-outlined" aria-hidden="true">mail</span></span>Contacto y soporte</a>
+</div>
+<div class="mm-acciones">
+<a class="mm-principal" href="01-datos-auto.html">Analizar mi auto</a>
+<a href="consultar-reporte.html">Consultar mi reporte</a>
+</div>
+</div>
+</div>
 
 <main class="flex-grow flex flex-col" id="main-content">
 
@@ -805,22 +840,66 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 </a>
 
 <script>
-    // Toggle del menú móvil
+    // Menú móvil (panel lateral)
     const menuToggle = document.getElementById('mobile-menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
-    menuToggle.addEventListener('click', () => {
-        const isOpen = mobileMenu.classList.toggle('open');
-        menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        menuToggle.querySelector('.material-symbols-outlined').textContent = isOpen ? 'close' : 'menu';
-    });
-    // Cierra el menú móvil al elegir un link
-    mobileMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-            menuToggle.querySelector('.material-symbols-outlined').textContent = 'menu';
+    const menuCerrar = document.getElementById('mobile-menu-cerrar');
+    const enlacesSeccion = mobileMenu.querySelectorAll('.mm-secciones a');
+
+    // Mientras el panel está abierto, el resto de la página no recibe foco ni toques
+    function bloquearFondo(bloquear) {
+        Array.from(document.body.children).forEach(el => {
+            if (el !== mobileMenu && el.tagName !== 'SCRIPT') el.inert = bloquear;
         });
-    });
+        document.documentElement.classList.toggle('menu-abierto', bloquear);
+    }
+
+    // Resalta la sección que se está viendo
+    function marcarSeccionActual() {
+        const limite = window.innerHeight * 0.4;
+        const alFinal = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+        let actual = null;
+        let mayorTop = -Infinity;
+        enlacesSeccion.forEach(a => {
+            const seccion = document.querySelector(a.getAttribute('href'));
+            if (!seccion) return;
+            const top = seccion.getBoundingClientRect().top;
+            if ((top <= limite || alFinal) && top > mayorTop) { actual = a; mayorTop = top; }
+        });
+        enlacesSeccion.forEach(a => {
+            if (a === actual) a.setAttribute('aria-current', 'location');
+            else a.removeAttribute('aria-current');
+        });
+    }
+
+    function abrirMenu() {
+        marcarSeccionActual();
+        mobileMenu.classList.add('open');
+        menuToggle.setAttribute('aria-expanded', 'true');
+        menuToggle.setAttribute('aria-label', 'Cerrar menú de navegación');
+        bloquearFondo(true);
+        menuCerrar.focus({ preventScroll: true });
+    }
+
+    function cerrarMenu(regresarFoco) {
+        if (!mobileMenu.classList.contains('open')) return;
+        mobileMenu.classList.remove('open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.setAttribute('aria-label', 'Abrir menú de navegación');
+        bloquearFondo(false);
+        if (regresarFoco) menuToggle.focus({ preventScroll: true });
+    }
+
+    menuToggle.addEventListener('click', abrirMenu);
+    menuCerrar.addEventListener('click', () => cerrarMenu(true));
+    document.getElementById('mobile-menu-fondo').addEventListener('click', () => cerrarMenu(true));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarMenu(true); });
+    // Cierra el panel al elegir un enlace
+    mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => cerrarMenu(false)));
+    // Al pasar a tamaño de escritorio (girar la pantalla) se cierra y se libera el scroll
+    window.matchMedia('(min-width: 768px)').addEventListener('change', e => { if (e.matches) cerrarMenu(false); });
+    // Al regresar con el botón "atrás" el panel no debe quedar abierto
+    window.addEventListener('pageshow', () => cerrarMenu(false));
 </script>
 </body>
 </html>
