@@ -55,26 +55,27 @@
 <main class="flex-grow px-4 md:px-16 py-10">
 <div id="estado-no-encontrado" class="hidden max-w-md mx-auto w-full flex flex-col items-center text-center gap-4 py-16">
 <span class="material-symbols-outlined text-warn" style="font-size:2.5rem" aria-hidden="true">search_off</span>
-<h1 class="text-2xl font-bold text-on-background">No encontramos este reporte</h1>
-<p class="text-on-surface-variant">Puede que el enlace esté incompleto o que el reporte no esté asociado a tu correo verificado.</p>
+<h1 id="error-titulo" class="text-2xl font-bold text-on-background">No encontramos este reporte</h1>
+<p id="error-texto" class="text-on-surface-variant">Puede que el enlace esté incompleto o que el reporte no esté asociado a tu correo verificado.</p>
 <a href="consultar-reporte.html" class="bg-primary-container text-on-primary-fixed font-bold px-6 py-3 rounded-full hover:brightness-110 transition-all">Consultar mi reporte</a>
 </div>
-<div id="contenido-resultado" class="max-w-5xl mx-auto w-full flex flex-col gap-8">
+<p id="estado-cargando" role="status" class="text-center text-on-surface-variant py-16">Cargando tu reporte…</p>
+<div id="contenido-resultado" class="hidden max-w-5xl mx-auto w-full flex flex-col gap-8">
 
 <div>
 <span class="inline-flex items-center gap-2 text-primary-container font-bold text-xs uppercase tracking-widest mb-3">
 <span class="material-symbols-outlined text-base" aria-hidden="true">check_circle</span> Análisis completado
 </span>
-<h1 id="vehiculo-titulo" class="text-3xl md:text-4xl font-bold text-on-background">Audi A1 2018</h1>
-<p id="vehiculo-detalle" class="text-on-surface-variant mt-1">65,000 km · $215,000 MXN · Agencia seminuevos</p>
-<p class="text-xs text-on-surface-variant mt-1">Reporte <span id="report-id">AS-7K4P9X2M</span></p>
+<h1 id="vehiculo-titulo" class="text-3xl md:text-4xl font-bold text-on-background">—</h1>
+<p id="vehiculo-detalle" class="text-on-surface-variant mt-1">—</p>
+<p class="text-xs text-on-surface-variant mt-1">Reporte <span id="report-id">—</span></p>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <div class="bg-level-1 rounded-2xl p-6 flex flex-col items-center text-center">
 <p class="text-xs font-bold tracking-widest uppercase text-on-surface-variant mb-4">AutoScore</p>
 <div class="relative w-full max-w-[220px]">
-<svg id="gauge-svg" class="w-full overflow-visible" viewBox="0 0 200 110" role="img" aria-label="AutoScore 82 de 100, riesgo bajo">
+<svg id="gauge-svg" class="w-full overflow-visible" viewBox="0 0 200 110" role="img" aria-label="AutoScore">
 <defs>
 <linearGradient id="gaugeGrad" x1="0%" x2="100%" y1="0%" y2="0%">
 <stop offset="0%" stop-color="#ff4d4d"></stop>
@@ -83,19 +84,19 @@
 </linearGradient>
 </defs>
 <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#333" stroke-linecap="round" stroke-width="14"></path>
-<path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" stroke-dasharray="251" stroke-dashoffset="45" stroke-linecap="round" stroke-width="14"></path>
-<g id="gauge-needle" transform="rotate(57.6, 100, 100)">
+<path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" id="gauge-arco" stroke="url(#gaugeGrad)" stroke-dasharray="251" stroke-dashoffset="251" stroke-linecap="round" stroke-width="14"></path>
+<g id="gauge-needle" transform="rotate(-90, 100, 100)">
 <polygon fill="#fff" points="98,100 102,100 100,45"></polygon>
 <circle cx="100" cy="100" fill="#fff" r="6"></circle>
 </g>
 </svg>
 </div>
 <div class="flex items-baseline gap-1 -mt-2">
-<span id="score-numero" class="text-5xl font-bold text-primary-container">82</span>
+<span id="score-numero" class="text-5xl font-bold text-primary-container">—</span>
 <span class="text-on-surface-variant">/100</span>
 </div>
 <span id="riesgo-badge" class="mt-3 inline-flex items-center gap-2 bg-[#152e20] text-primary-container border border-primary-container/30 font-bold text-xs uppercase tracking-widest px-3 py-1.5 rounded-full">
-<span class="w-2 h-2 rounded-full bg-primary-container" aria-hidden="true"></span> <span id="riesgo-texto">Riesgo bajo</span>
+<span class="w-2 h-2 rounded-full bg-primary-container" aria-hidden="true"></span> <span id="riesgo-texto">—</span>
 </span>
 </div>
 
@@ -105,9 +106,9 @@
 <div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
 <span id="recomendacion-icono" class="material-symbols-outlined text-primary-container" aria-hidden="true">verified</span>
 </div>
-<h2 id="recomendacion-titulo" class="text-xl font-bold text-on-background">Compra recomendable</h2>
+<h2 id="recomendacion-titulo" class="text-xl font-bold text-on-background">—</h2>
 </div>
-<p id="recomendacion-texto" class="text-sm text-on-surface-variant">La información disponible no muestra señales de alto riesgo. Antes de comprar, valida los puntos identificados en el análisis.</p>
+<p id="recomendacion-texto" class="text-sm text-on-surface-variant">—</p>
 <div class="flex flex-col sm:flex-row gap-3 mt-2">
 <a href="#detalle" class="flex-1 bg-primary-container text-on-primary-fixed font-bold px-6 py-3 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2 text-sm">
 Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span>
@@ -125,44 +126,29 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
 <div id="hallazgos-lista" class="flex flex-col divide-y divide-border-level-1">
 <div class="flex items-center justify-between py-3" data-categoria="historial">
 <span class="flex items-center gap-2 text-sm font-bold"><span class="material-symbols-outlined text-primary-container text-lg" aria-hidden="true">history</span> Historial</span>
-<span class="flex items-center gap-1 text-sm text-primary-container">Sin alertas identificadas <span class="material-symbols-outlined text-lg" aria-hidden="true">check_circle</span></span>
+<span class="flex items-center gap-1 text-sm text-on-surface-variant">Pendiente de revisión <span class="material-symbols-outlined text-lg" aria-hidden="true">schedule</span></span>
 </div>
 <div class="flex items-center justify-between py-3" data-categoria="identidad_vehiculo">
 <span class="flex items-center gap-2 text-sm font-bold"><span class="material-symbols-outlined text-primary-container text-lg" aria-hidden="true">badge</span> Identidad del vehículo</span>
-<span class="flex items-center gap-1 text-sm text-primary-container">Información consistente <span class="material-symbols-outlined text-lg" aria-hidden="true">check_circle</span></span>
+<span class="flex items-center gap-1 text-sm text-on-surface-variant">Pendiente de revisión <span class="material-symbols-outlined text-lg" aria-hidden="true">schedule</span></span>
 </div>
 <div class="flex items-center justify-between py-3" data-categoria="precio_mercado">
 <span class="flex items-center gap-2 text-sm font-bold"><span class="material-symbols-outlined text-primary-container text-lg" aria-hidden="true">payments</span> Precio de mercado</span>
-<span class="flex items-center gap-1 text-sm text-primary-container">En rango <span class="material-symbols-outlined text-lg" aria-hidden="true">check_circle</span></span>
+<span class="flex items-center gap-1 text-sm text-on-surface-variant">Pendiente de revisión <span class="material-symbols-outlined text-lg" aria-hidden="true">schedule</span></span>
 </div>
 <div class="flex items-center justify-between py-3" data-categoria="analisis_imagenes">
 <span class="flex items-center gap-2 text-sm font-bold"><span class="material-symbols-outlined text-primary-container text-lg" aria-hidden="true">photo_camera</span> Análisis de imágenes</span>
-<span class="flex items-center gap-1 text-sm text-primary-container">Información consistente <span class="material-symbols-outlined text-lg" aria-hidden="true">check_circle</span></span>
+<span class="flex items-center gap-1 text-sm text-on-surface-variant">Pendiente de revisión <span class="material-symbols-outlined text-lg" aria-hidden="true">schedule</span></span>
 </div>
-<div class="flex items-center justify-between py-3 border-l-2 pl-3" style="border-left-color:#FFAB40" data-categoria="inconsistencias">
+<div class="flex items-center justify-between py-3" data-categoria="inconsistencias">
 <span class="flex items-center gap-2 text-sm font-bold"><span class="material-symbols-outlined text-warn text-lg" aria-hidden="true">warning</span> Inconsistencias</span>
-<span class="flex items-center gap-1 text-sm text-warn">2 puntos por validar <span class="material-symbols-outlined text-lg" aria-hidden="true">error</span></span>
+<span class="flex items-center gap-1 text-sm text-on-surface-variant">Pendiente de revisión <span class="material-symbols-outlined text-lg" aria-hidden="true">schedule</span></span>
 </div>
 </div>
 
-<div id="puntos-validar-seccion" class="bg-surface-container-lowest rounded-xl p-5 mt-2">
+<div id="puntos-validar-seccion" class="hidden bg-surface-container-lowest rounded-xl p-5 mt-2">
 <p class="flex items-center gap-2 font-bold text-warn text-sm uppercase tracking-wide mb-4"><span class="material-symbols-outlined" aria-hidden="true">warning</span> Puntos a validar</p>
-<div id="puntos-validar-lista" class="flex flex-col gap-4">
-<div class="flex gap-3" data-punto="1">
-<span class="w-6 h-6 rounded-full bg-warn/20 text-warn font-bold text-xs flex items-center justify-center shrink-0">1</span>
-<div>
-<p class="font-bold text-on-background text-sm">Kilometraje</p>
-<p class="text-sm text-on-surface-variant">Validar que el kilometraje mostrado coincida con documentación, tablero y registros disponibles.</p>
-</div>
-</div>
-<div class="flex gap-3" data-punto="2">
-<span class="w-6 h-6 rounded-full bg-warn/20 text-warn font-bold text-xs flex items-center justify-center shrink-0">2</span>
-<div>
-<p class="font-bold text-on-background text-sm">Información del anuncio</p>
-<p class="text-sm text-on-surface-variant">Confirmar que las características publicadas coincidan con el vehículo que estás revisando.</p>
-</div>
-</div>
-</div>
+<div id="puntos-validar-lista" class="flex flex-col gap-4"></div>
 </div>
 </div>
 
@@ -170,11 +156,11 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
 <div class="bg-level-1 rounded-2xl p-6">
 <p class="text-xs font-bold tracking-widest uppercase text-on-surface-variant mb-4">Detalles del vehículo</p>
 <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-<div><p class="text-on-surface-variant">Vehículo</p><p id="detalle-vehiculo" class="font-bold text-on-background">Audi A1</p></div>
-<div><p class="text-on-surface-variant">Año</p><p id="detalle-anio" class="font-bold text-on-background">2018</p></div>
-<div><p class="text-on-surface-variant">Kilometraje</p><p id="detalle-km" class="font-bold text-on-background">65,000 km</p></div>
-<div><p class="text-on-surface-variant">Precio declarado</p><p id="detalle-precio" class="font-bold text-on-background">$215,000 MXN</p></div>
-<div><p class="text-on-surface-variant">Ubicación</p><p id="detalle-ubicacion" class="font-bold text-on-background">Agencia</p></div>
+<div><p class="text-on-surface-variant">Vehículo</p><p id="detalle-vehiculo" class="font-bold text-on-background">—</p></div>
+<div><p class="text-on-surface-variant">Año</p><p id="detalle-anio" class="font-bold text-on-background">—</p></div>
+<div><p class="text-on-surface-variant">Kilometraje</p><p id="detalle-km" class="font-bold text-on-background">—</p></div>
+<div><p class="text-on-surface-variant">Precio declarado</p><p id="detalle-precio" class="font-bold text-on-background">—</p></div>
+<div><p class="text-on-surface-variant">Ubicación</p><p id="detalle-ubicacion" class="font-bold text-on-background">—</p></div>
 </div>
 </div>
 
@@ -221,10 +207,17 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
     function mostrarNoEncontrado() {
         document.getElementById('estado-no-encontrado').classList.remove('hidden');
         document.getElementById('contenido-resultado').classList.add('hidden');
+        document.getElementById('estado-cargando').classList.add('hidden');
+    }
+
+    function mostrarErrorDeCarga() {
+        document.getElementById('error-titulo').textContent = 'No pudimos cargar tu reporte';
+        document.getElementById('error-texto').textContent = 'Revisa tu conexión y vuelve a cargar la página en unos momentos.';
+        mostrarNoEncontrado();
     }
 
     function pintarBadgeRiesgo(riskLevel) {
-        const estilo = RIESGO_ESTILO[riskLevel] || RIESGO_ESTILO.bajo;
+        const estilo = RIESGO_ESTILO[riskLevel];
         const badge = document.getElementById('riesgo-badge');
         const dot = document.getElementById('riesgo-badge-dot') || document.querySelector('#riesgo-badge span[aria-hidden]');
         badge.style.background = estilo.bg;
@@ -253,7 +246,7 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
             const iconoEstado = textoContenedor.querySelector('.material-symbols-outlined');
 
             const estilo = dato ? (FINDING_ESTILO[dato.status] || FINDING_ESTILO_DEFAULT) : FINDING_ESTILO_DEFAULT;
-            const texto = dato ? dato.detail : FINDING_ESTILO_DEFAULT.textoDefault;
+            const texto = !dato ? FINDING_ESTILO_DEFAULT.textoDefault : (dato.detail || 'Sin detalle');
 
             textoContenedor.className = 'flex items-center gap-1 text-sm ' + estilo.clase;
             textoContenedor.firstChild.textContent = texto + ' ';
@@ -290,6 +283,25 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
         });
     }
 
+    // Un reporte solo se muestra si está completado y trae score y riesgo válidos.
+    function reporteCompleto(r) {
+        return r.status === 'completado' && Number.isInteger(r.autoscore) && r.autoscore >= 0 && r.autoscore <= 100
+            && Object.prototype.hasOwnProperty.call(RIESGO_ESTILO, r.risk_level);
+    }
+
+    function irAEnPreparacion(r) {
+        const status = r.status === 'completado' ? 'procesando' : r.status;
+        window.location.replace('reporte-en-preparacion.html?id=' + encodeURIComponent(r.id) + '&status=' + encodeURIComponent(status));
+    }
+
+    function pintarScore(score, riesgo) {
+        document.getElementById('score-numero').textContent = score;
+        const angulo = -90 + (score / 100) * 180;
+        document.getElementById('gauge-needle').setAttribute('transform', 'rotate(' + angulo + ', 100, 100)');
+        document.getElementById('gauge-arco').setAttribute('stroke-dashoffset', String(251 * (1 - score / 100)));
+        document.getElementById('gauge-svg').setAttribute('aria-label', 'AutoScore ' + score + ' de 100, ' + RIESGO_ESTILO[riesgo].texto.toLowerCase());
+    }
+
     (async function cargar() {
         const { data: { session } } = await sb.auth.getSession();
         if (!session) {
@@ -309,15 +321,20 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
             .eq('id', reportId)
             .limit(1);
 
-        if (error || !reportes || reportes.length === 0) {
+        if (error) {
+            mostrarErrorDeCarga();
+            return;
+        }
+
+        if (!reportes || reportes.length === 0) {
             mostrarNoEncontrado();
             return;
         }
 
         const reporte = reportes[0];
 
-        if (reporte.status !== 'completado') {
-            window.location.href = 'reporte-en-preparacion.html?id=' + encodeURIComponent(reporte.id) + '&status=' + encodeURIComponent(reporte.status);
+        if (!reporteCompleto(reporte)) {
+            irAEnPreparacion(reporte);
             return;
         }
 
@@ -334,42 +351,45 @@ Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidd
         const v = reporte.vehicles;
         if (v) {
             const nombre = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ');
-            document.getElementById('vehiculo-titulo').textContent = nombre;
+            document.getElementById('vehiculo-titulo').textContent = nombre || '—';
             const detalle = [];
             if (v.kilometraje) detalle.push(v.kilometraje.toLocaleString('es-MX') + ' km');
             if (v.precio_venta) detalle.push('$' + Number(v.precio_venta).toLocaleString('es-MX') + ' MXN');
             if (v.lugar_compra) detalle.push(v.lugar_compra);
-            document.getElementById('vehiculo-detalle').textContent = detalle.join(' · ');
+            document.getElementById('vehiculo-detalle').textContent = detalle.join(' · ') || '—';
 
-            document.getElementById('detalle-vehiculo').textContent = [v.marca, v.modelo].filter(Boolean).join(' ');
+            document.getElementById('detalle-vehiculo').textContent = [v.marca, v.modelo].filter(Boolean).join(' ') || '—';
             document.getElementById('detalle-anio').textContent = v.anio || '—';
             document.getElementById('detalle-km').textContent = v.kilometraje ? v.kilometraje.toLocaleString('es-MX') + ' km' : '—';
             document.getElementById('detalle-precio').textContent = v.precio_venta ? '$' + Number(v.precio_venta).toLocaleString('es-MX') + ' MXN' : '—';
             document.getElementById('detalle-ubicacion').textContent = v.lugar_compra || '—';
         }
 
-        if (typeof reporte.autoscore === 'number') {
-            document.getElementById('score-numero').textContent = reporte.autoscore;
-            const angulo = -90 + (reporte.autoscore / 100) * 180;
-            document.getElementById('gauge-needle').setAttribute('transform', 'rotate(' + angulo + ', 100, 100)');
-        }
-
+        pintarScore(reporte.autoscore, reporte.risk_level);
         pintarBadgeRiesgo(reporte.risk_level);
 
-        const rec = RECOMENDACION[reporte.risk_level] || RECOMENDACION.bajo;
+        const rec = RECOMENDACION[reporte.risk_level];
         document.getElementById('recomendacion-titulo').textContent = rec.titulo;
         document.getElementById('recomendacion-icono').textContent = rec.icono;
-        if (reporte.recommendation_text) {
-            document.getElementById('recomendacion-texto').textContent = reporte.recommendation_text;
-        }
+        const textoRec = document.getElementById('recomendacion-texto');
+        textoRec.textContent = reporte.recommendation_text || '';
+        textoRec.classList.toggle('hidden', !reporte.recommendation_text);
 
-        const [{ data: findings }, { data: puntos }] = await Promise.all([
+        const [{ data: findings, error: errorHallazgos }, { data: puntos, error: errorPuntos }] = await Promise.all([
             sb.from('report_findings').select('category, status, detail').eq('report_id', reporte.id),
             sb.from('report_validation_points').select('titulo, descripcion, orden').eq('report_id', reporte.id).order('orden')
         ]);
 
+        // Un reporte a medias podría ocultar advertencias: mejor no mostrarlo.
+        if (errorHallazgos || errorPuntos) {
+            mostrarErrorDeCarga();
+            return;
+        }
+
         pintarHallazgos(findings);
         pintarPuntosValidar(puntos);
+        document.getElementById('estado-cargando').classList.add('hidden');
+        document.getElementById('contenido-resultado').classList.remove('hidden');
     })();
 </script>
 </body>

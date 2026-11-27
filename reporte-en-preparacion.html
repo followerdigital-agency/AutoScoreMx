@@ -74,13 +74,13 @@
 <span class="material-symbols-outlined text-primary-container" aria-hidden="true">directions_car</span>
 </div>
 <div>
-<h2 id="vehiculo-titulo" class="font-bold text-on-background">Audi A1 2018</h2>
-<p class="text-xs text-on-surface-variant uppercase tracking-wide">Reporte <span id="reporte-numero-texto">AS-7K4P9X2M</span></p>
+<h2 id="vehiculo-titulo" class="font-bold text-on-background">—</h2>
+<p class="text-xs text-on-surface-variant uppercase tracking-wide">Reporte <span id="reporte-numero-texto">—</span></p>
 </div>
 </div>
 <div class="flex justify-between text-sm">
-<span class="text-on-surface-variant">Pago confirmado</span>
-<span id="pago-fecha-texto" class="font-bold text-on-background">Hoy, 10:18 AM</span>
+<span class="text-on-surface-variant">Solicitud enviada</span>
+<span id="solicitud-fecha-texto" class="font-bold text-on-background">—</span>
 </div>
 <div class="flex justify-between text-sm">
 <span id="estado-fila-label" class="text-on-surface-variant">Tiempo estimado de entrega</span>
@@ -181,7 +181,7 @@
         let rawStatus = params.get('status');
 
         let query = sb.from('reports')
-            .select('id, status, paid_at, vehicles ( marca, modelo, anio )');
+            .select('id, status, created_at, vehicles ( marca, modelo, anio )');
 
         if (reportId) {
             query = query.eq('id', reportId);
@@ -207,9 +207,9 @@
             document.getElementById('vehiculo-titulo').textContent =
                 [reporte.vehicles.marca, reporte.vehicles.modelo, reporte.vehicles.anio].filter(Boolean).join(' ');
         }
-        if (reporte.paid_at) {
-            document.getElementById('pago-fecha-texto').textContent =
-                new Date(reporte.paid_at).toLocaleString('es-MX', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+        if (reporte.created_at) {
+            document.getElementById('solicitud-fecha-texto').textContent =
+                new Date(reporte.created_at).toLocaleString('es-MX', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
         }
     })();
 </script>
