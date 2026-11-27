@@ -197,6 +197,15 @@
             left: 0;
         }
 
+        /* El menú fijo no debe tapar las secciones: al navegar, el título queda justo debajo.
+           Valor = alto del menú + aire - espacio superior propio de la sección. */
+        #como-funciona, #que-analizamos, #precio, #preguntas { scroll-margin-top: 33px; }
+        #contacto { scroll-margin-top: 25px; }
+        @media (min-width: 768px) {
+            #como-funciona, #que-analizamos, #precio, #preguntas { scroll-margin-top: -27px; }
+            #contacto { scroll-margin-top: 37px; }
+        }
+
         /* Menú móvil */
         #mobile-menu {
             display: none;
@@ -378,7 +387,7 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 </section>
 
 <!-- The Problem Section -->
-<section class="bg-level-0 py-14 md:py-32 px-margin-mobile md:px-margin-desktop relative overflow-hidden">
+<section id="que-analizamos" class="bg-level-0 py-14 md:py-32 px-margin-mobile md:px-margin-desktop relative overflow-hidden">
 <div class="max-w-7xl mx-auto w-full flex flex-col gap-16 relative z-10">
 <div class="flex flex-col items-center text-center gap-4 max-w-3xl mx-auto">
 <span class="text-primary-container font-label-bold tracking-widest uppercase">Cada auto tiene señales</span>
@@ -474,7 +483,7 @@ Ver un reporte de ejemplo <span class="material-symbols-outlined text-base" aria
 <p class="text-body-lg font-body-lg text-on-surface-variant">Comparte la información del vehículo, deja que AutoScore analice las señales disponibles y recibe una evaluación clara para saber qué revisar antes de comprar.</p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="que-analizamos">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 <div class="flex flex-col gap-6">
 <div class="bg-surface-container border border-outline-variant rounded-2xl p-6 h-64 flex flex-col justify-center items-center relative overflow-hidden shadow-lg">
 <div class="w-full max-w-xs bg-surface border border-outline-variant rounded-xl p-5 shadow-2xl z-10 flex flex-col gap-4">

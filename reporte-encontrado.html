@@ -82,9 +82,9 @@
 <a id="link-reporte-completo" href="04-resultado.html?id=AS-7K4P9X2M" class="flex-1 bg-primary-container text-on-primary-fixed font-bold px-6 py-3.5 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2">
 Ver reporte completo <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span>
 </a>
-<button class="flex-1 border border-outline-variant text-on-background font-bold px-6 py-3.5 rounded-full hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2">
+<a id="btn-pdf" target="_blank" rel="noopener" class="hidden flex-1 border border-outline-variant text-on-background font-bold px-6 py-3.5 rounded-full hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2">
 Descargar PDF <span class="material-symbols-outlined text-base" aria-hidden="true">download</span>
-</button>
+</a>
 </div>
 </div>
 
@@ -157,7 +157,7 @@ Descargar PDF <span class="material-symbols-outlined text-base" aria-hidden="tru
 
         const { data, error } = await sb
             .from('reports')
-            .select('id, status, autoscore, risk_level, analysis_completed_at, vehicles ( marca, modelo, anio, kilometraje, precio_venta, niv, placas )')
+            .select('id, status, autoscore, risk_level, analysis_completed_at, report_pdf_url, vehicles ( marca, modelo, anio, kilometraje, precio_venta, niv, placas )')
             .eq('id', reportId)
             .limit(1);
 
@@ -170,6 +170,14 @@ Descargar PDF <span class="material-symbols-outlined text-base" aria-hidden="tru
         document.getElementById('reporte-fecha-texto').textContent = 'Reporte ' + reporte.id +
             (reporte.analysis_completed_at ? ' generado el ' + new Date(reporte.analysis_completed_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) : '');
         document.getElementById('link-reporte-completo').href = '04-resultado.html?id=' + encodeURIComponent(reporte.id);
+
+        // Solo se muestra si el reporte tiene un PDF guardado en nuestro bucket.
+        const prefijoPdf = 'https://nnlxcelrbkreffxotezo.supabase.co/storage/v1/object/public/report-pdfs/';
+        if (reporte.report_pdf_url && reporte.report_pdf_url.startsWith(prefijoPdf)) {
+            const enlacePdf = document.getElementById('btn-pdf');
+            enlacePdf.href = reporte.report_pdf_url;
+            enlacePdf.classList.remove('hidden');
+        }
 
         const v = reporte.vehicles;
         if (v) {
