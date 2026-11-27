@@ -174,13 +174,10 @@
 <div class="flex flex-col gap-2">
 <label for="edit-status" class="text-sm font-bold text-on-surface-variant">Status</label>
 <select id="edit-status" class="field">
-<option value="borrador">Borrador</option>
-<option value="pendiente_pago">Pendiente de pago</option>
 <option value="pendiente">Pendiente</option>
-<option value="procesando">Procesando</option>
+<option value="procesando">En revisión</option>
 <option value="completado">Completado</option>
 <option value="no_concluyente">No concluyente</option>
-<option value="reembolsado">Reembolsado</option>
 </select>
 </div>
 <div class="flex flex-col gap-2">
@@ -268,8 +265,13 @@
 
     const STATUS_LABEL = {
         borrador: 'Borrador', pendiente_pago: 'Pendiente de pago', pendiente: 'Pendiente',
-        procesando: 'Procesando', completado: 'Completado', no_concluyente: 'No concluyente', reembolsado: 'Reembolsado'
+        procesando: 'En revisión', completado: 'Completado', no_concluyente: 'No concluyente', reembolsado: 'Reembolsado'
     };
+    // Estados que se usan hoy. 'pendiente_pago' y 'reembolsado' siguen en la base de datos:
+    // volver a agregarlos aquí cuando se conecte la pasarela de pago.
+    const STATUS_VISIBLES = ['pendiente', 'procesando', 'completado', 'no_concluyente'];
+    const ESTADOS_HALLAZGO = ['ok', 'advertencia', 'sin_datos'];
+    const DETALLE_VACIO_ANTERIOR = 'Pendiente de revisión';
     const STATUS_COLOR = {
         borrador: 'background:#3A3A3A;color:#c7d6c6', pendiente_pago: 'background:#3A3A3A;color:#c7d6c6',
         pendiente: 'background:#332a12;color:#FFAB40', procesando: 'background:#332a12;color:#FFAB40',
@@ -385,7 +387,10 @@
 
     function renderizarFiltros() {
         const cont = document.getElementById('filtros');
-        const opciones = [['todos', 'Todos']].concat(Object.entries(STATUS_LABEL));
+        // Si algún reporte tiene un estado oculto, su filtro aparece para no perderlo de vista.
+        const ocultos = Object.keys(STATUS_LABEL).filter(s => !STATUS_VISIBLES.includes(s) && reportesCache.some(r => r.status === s));
+        const opciones = [['todos', 'Todos']].concat(STATUS_VISIBLES.concat(ocultos).map(s => [s, STATUS_LABEL[s]]));
+        if (!opciones.some(([valor]) => valor === filtroActivo)) filtroActivo = 'todos';
         cont.innerHTML = '';
         opciones.forEach(([valor, label]) => {
             const btn = document.createElement('button');
@@ -443,12 +448,17 @@
         cont.innerHTML = '';
         CATEGORIAS.forEach(cat => {
             const dato = (datos || []).find(d => d.category === cat.key) || {};
+            // Versiones anteriores guardaban "OK" por defecto sin que nadie lo revisara.
+            const sinDetalle = dato.detail === DETALLE_VACIO_ANTERIOR;
+            const estado = (sinDetalle && dato.status === 'ok') ? '' : (dato.status || '');
             const fila = document.createElement('div');
             fila.className = 'grid grid-cols-1 sm:grid-cols-[180px_140px_1fr] gap-2 items-center';
             fila.dataset.categoria = cat.key;
             fila.innerHTML =
                 '<span class="text-sm font-bold">' + cat.label + '</span>' +
                 '<select class="field cat-status">' +
+                    // Una categoría ya revisada no puede volver a "Sin revisar".
+                    (estado ? '' : '<option value="">Sin revisar</option>') +
                     '<option value="ok">OK</option>' +
                     '<option value="advertencia">Advertencia</option>' +
                     '<option value="sin_datos">Sin datos</option>' +
@@ -456,8 +466,8 @@
                 '<input type="text" class="field cat-detail" placeholder="Texto corto para el cliente"/>';
             fila.querySelector('.cat-status').setAttribute('aria-label', 'Estado: ' + cat.label);
             fila.querySelector('.cat-detail').setAttribute('aria-label', 'Detalle: ' + cat.label);
-            fila.querySelector('.cat-status').value = dato.status || 'ok';
-            fila.querySelector('.cat-detail').value = dato.detail || '';
+            fila.querySelector('.cat-status').value = estado;
+            fila.querySelector('.cat-detail').value = sinDetalle ? '' : (dato.detail || '');
             cont.appendChild(fila);
         });
     }
@@ -496,7 +506,11 @@
         document.getElementById('modal-titulo').textContent = 'Reporte ' + reporte.id;
         document.getElementById('modal-subtitulo').textContent = vehiculo + ' · ' + reporte.email;
 
-        document.getElementById('edit-status').value = reporte.status;
+        const selectStatus = document.getElementById('edit-status');
+        selectStatus.innerHTML = '';
+        const estados = STATUS_VISIBLES.includes(reporte.status) ? STATUS_VISIBLES : STATUS_VISIBLES.concat(reporte.status);
+        estados.forEach(s => selectStatus.add(new Option(STATUS_LABEL[s] || s, s)));
+        selectStatus.value = reporte.status;
         document.getElementById('edit-autoscore').value = reporte.autoscore ?? '';
         document.getElementById('edit-risk').value = reporte.risk_level || '';
         document.getElementById('edit-recomendacion').value = reporte.recommendation_text || '';
@@ -555,7 +569,7 @@
                 const cat = fila.dataset.categoria;
                 const dato = datos.findings[cat];
                 if (dato) {
-                    if (dato.status) fila.querySelector('.cat-status').value = dato.status;
+                    if (ESTADOS_HALLAZGO.includes(dato.status)) fila.querySelector('.cat-status').value = dato.status;
                     if (dato.detail) fila.querySelector('.cat-detail').value = dato.detail;
                 }
             });
@@ -567,10 +581,47 @@
         }
     }
 
+    // Devuelve el mensaje de lo que impide guardar, o '' si todo está en orden.
+    function revisarAntesDeGuardar(status) {
+        const filas = CATEGORIAS.map(cat => {
+            const fila = document.querySelector('#hallazgos-editor > div[data-categoria="' + cat.key + '"]');
+            return {
+                label: cat.label,
+                estado: fila.querySelector('.cat-status').value,
+                detalle: fila.querySelector('.cat-detail').value.trim()
+            };
+        });
+
+        if (status === 'completado') {
+            const faltan = [];
+            const autoscore = document.getElementById('edit-autoscore');
+            const valor = Number(autoscore.value);
+            if (autoscore.value === '' || !Number.isInteger(valor) || valor < 0 || valor > 100) faltan.push('AutoScore (número entero de 0 a 100)');
+            if (!document.getElementById('edit-risk').value) faltan.push('Nivel de riesgo');
+            if (!document.getElementById('edit-recomendacion').value.trim()) faltan.push('Recomendación');
+            filas.forEach(f => {
+                if (!f.estado && !f.detalle) faltan.push(f.label + ': estado y detalle');
+                else if (!f.estado) faltan.push(f.label + ': estado');
+                else if (!f.detalle) faltan.push(f.label + ': detalle');
+            });
+            return faltan.length ? 'Para marcarlo como Completado falta: ' + faltan.join('; ') + '.' : '';
+        }
+
+        const sinEstado = filas.filter(f => !f.estado && f.detalle).map(f => f.label);
+        return sinEstado.length ? 'Elige un estado en: ' + sinEstado.join(', ') + ' (ya escribiste un detalle).' : '';
+    }
+
     async function guardarReporte() {
         if (!reporteActual) return;
         const errorEl = document.getElementById('modal-error');
         errorEl.classList.add('hidden');
+
+        const pendiente = revisarAntesDeGuardar(document.getElementById('edit-status').value);
+        if (pendiente) {
+            errorEl.textContent = pendiente;
+            errorEl.classList.remove('hidden');
+            return;
+        }
 
         const boton = document.getElementById('btn-guardar');
         boton.disabled = true;
@@ -599,18 +650,17 @@
                 datosReporte.report_pdf_url = urlData.publicUrl;
             }
 
-            const { error: reportError } = await sb.from('reports').update(datosReporte).eq('id', reporteActual.id);
-            if (reportError) throw new Error('No se pudo guardar el reporte: ' + reportError.message);
-
             const filasHallazgos = Array.from(document.querySelectorAll('#hallazgos-editor > div')).map(fila => ({
                 report_id: reporteActual.id,
                 category: fila.dataset.categoria,
                 status: fila.querySelector('.cat-status').value,
-                detail: fila.querySelector('.cat-detail').value.trim() || 'Pendiente de revisión'
-            }));
-            const { error: findingsError } = await sb.from('report_findings')
-                .upsert(filasHallazgos, { onConflict: 'report_id,category' });
-            if (findingsError) throw new Error('No se pudieron guardar los hallazgos: ' + findingsError.message);
+                detail: fila.querySelector('.cat-detail').value.trim()
+            })).filter(h => h.status);
+            if (filasHallazgos.length > 0) {
+                const { error: findingsError } = await sb.from('report_findings')
+                    .upsert(filasHallazgos, { onConflict: 'report_id,category' });
+                if (findingsError) throw new Error('No se pudieron guardar los hallazgos: ' + findingsError.message);
+            }
 
             const puntos = Array.from(document.querySelectorAll('#puntos-editor > div')).map((fila, i) => ({
                 report_id: reporteActual.id,
@@ -626,6 +676,9 @@
                 const { error: insertError } = await sb.from('report_validation_points').insert(puntos);
                 if (insertError) throw new Error('No se pudieron guardar los puntos a validar: ' + insertError.message);
             }
+
+            const { error: reportError } = await sb.from('reports').update(datosReporte).eq('id', reporteActual.id);
+            if (reportError) throw new Error('No se pudo guardar el reporte: ' + reportError.message);
 
             cerrarModal();
             await cargarReportes();
