@@ -110,20 +110,20 @@
 </span>
 
 <h1 class="text-3xl md:text-4xl font-bold text-on-background">Tu análisis se está preparando</h1>
-<p class="text-on-surface-variant">Recibirás tu reporte de <strong class="text-on-background">Audi A1 2018</strong> por correo en menos de 24 horas. Te avisamos en cuanto esté listo.</p>
+<p class="text-on-surface-variant">Recibirás tu reporte de <strong id="solicitud-vehiculo" class="text-on-background">tu auto</strong> por correo en menos de 24 horas. Te avisamos en cuanto esté listo.</p>
 
 <div class="bg-level-1 rounded-2xl p-6 w-full flex flex-col gap-4 text-left">
 <div class="flex justify-between text-sm">
 <span class="text-on-surface-variant">Número de reporte</span>
-<span class="font-bold text-on-background">AS-7K4P9X2M</span>
+<span id="solicitud-folio" class="font-bold text-on-background">—</span>
 </div>
 <div class="flex justify-between text-sm">
-<span class="text-on-surface-variant">Pago confirmado</span>
-<span class="font-bold text-on-background">Hoy, 10:18 AM</span>
+<span class="text-on-surface-variant">Solicitud enviada</span>
+<span id="solicitud-fecha" class="font-bold text-on-background">—</span>
 </div>
-<div class="flex justify-between text-sm">
-<span class="text-on-surface-variant">Correo de contacto</span>
-<span class="font-bold text-on-background">tu@correo.com</span>
+<div class="flex justify-between gap-4 text-sm">
+<span class="text-on-surface-variant shrink-0">Correo de contacto</span>
+<span id="solicitud-correo" class="font-bold text-on-background break-all text-right">—</span>
 </div>
 </div>
 
@@ -150,5 +150,26 @@
 </div>
 </div>
 </footer>
+<script>
+    (function mostrarSolicitud() {
+        let datos = null;
+        try {
+            datos = JSON.parse(sessionStorage.getItem('as_solicitud'));
+        } catch (e) { /* sin datos legibles */ }
+        // Sin una solicitud recién enviada no hay nada que mostrar.
+        if (!datos || !datos.folio) {
+            window.location.replace('consultar-reporte.html');
+            return;
+        }
+        const poner = (id, texto) => { if (texto) document.getElementById(id).textContent = texto; };
+        poner('solicitud-vehiculo', datos.vehiculo);
+        poner('solicitud-folio', datos.folio);
+        poner('solicitud-correo', datos.correo);
+        const fecha = new Date(datos.fecha);
+        if (!isNaN(fecha)) {
+            poner('solicitud-fecha', fecha.toLocaleString('es-MX', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }));
+        }
+    })();
+</script>
 </body>
 </html>

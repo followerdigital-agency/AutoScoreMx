@@ -256,6 +256,15 @@
         'ext-izq': 'Exterior — Lado izq.', 'ext-der': 'Exterior — Lado der.', 'ext-trasera': 'Exterior — Trasera'
     };
 
+    let vehiculoNombre = '';
+
+    // Mismo formato que genera la base de datos (AS- y 8 caracteres). Se crea aquí
+    // porque, sin sesión, no es posible leer de vuelta el reporte recién insertado.
+    function generarFolio() {
+        const letras = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        return 'AS-' + Array.from(crypto.getRandomValues(new Uint8Array(8)), n => letras[n % letras.length]).join('');
+    }
+
     (async function cargarVehiculo() {
         const vehicleId = sessionStorage.getItem('as_vehicle_id');
         if (!vehicleId) {
@@ -274,7 +283,8 @@
         }
 
         const v = vdata[0];
-        document.getElementById('vehiculo-titulo').textContent = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ');
+        vehiculoNombre = [v.marca, v.modelo, v.anio].filter(Boolean).join(' ');
+        document.getElementById('vehiculo-titulo').textContent = vehiculoNombre;
         document.getElementById('vehiculo-lugar').textContent = v.lugar_compra || '';
         document.getElementById('detalle-km').textContent = v.kilometraje ? v.kilometraje.toLocaleString('es-MX') + ' km' : 'No proporcionado';
         document.getElementById('detalle-precio').textContent = v.precio_venta ? '$' + Number(v.precio_venta).toLocaleString('es-MX') + ' MXN' : 'No proporcionado';
@@ -350,8 +360,9 @@
         // trigger de Supabase que manda el correo de "tu análisis está en proceso".
         // No pedimos la fila de vuelta (.select()): con RLS, leer el reporte recién
         // creado requiere sesión autenticada, y aquí no hay ninguna todavía.
+        const folio = generarFolio();
         const { error } = await sb.from('reports')
-            .insert({ vehicle_id: vehicleId, email: correo, status: 'pendiente' });
+            .insert({ id: folio, vehicle_id: vehicleId, email: correo, status: 'pendiente' });
 
         if (error) {
             boton.disabled = false;
@@ -360,6 +371,10 @@
             return;
         }
 
+        // Datos que muestra la siguiente pantalla; viven solo mientras dure la pestaña.
+        sessionStorage.setItem('as_solicitud', JSON.stringify({
+            folio: folio, correo: correo, vehiculo: vehiculoNombre, fecha: new Date().toISOString()
+        }));
         window.location.href = '03-5-analisis-en-proceso.html';
     }
 
