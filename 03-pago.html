@@ -293,7 +293,8 @@
         (fotos || []).forEach(f => {
             const li = document.createElement('li');
             li.className = 'flex items-center gap-2 text-on-background';
-            li.innerHTML = '<span class="material-symbols-outlined text-primary-container text-base" aria-hidden="true">check_circle</span> ' + (NOMBRES_SLOTS[f.slot] || f.slot);
+            li.innerHTML = '<span class="material-symbols-outlined text-primary-container text-base" aria-hidden="true">check_circle</span> ';
+            li.append(NOMBRES_SLOTS[f.slot] || f.slot);
             lista.appendChild(li);
         });
     })();

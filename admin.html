@@ -238,8 +238,9 @@
 </footer>
 
 <script>
+    const SUPABASE_URL = 'https://nnlxcelrbkreffxotezo.supabase.co';
     const sb = window.supabase.createClient(
-        'https://nnlxcelrbkreffxotezo.supabase.co',
+        SUPABASE_URL,
         'sb_publishable_WRLtbtqL5VDKbUhY-tzGEw_SkEbne5j'
     );
 
@@ -396,14 +397,24 @@
             const tr = document.createElement('tr');
             const vehiculo = r.vehicles ? [r.vehicles.marca, r.vehicles.modelo, r.vehicles.anio].filter(Boolean).join(' ') : '—';
             const fecha = r.created_at ? new Date(r.created_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-            tr.innerHTML =
-                '<td class="font-bold">' + r.id + '</td>' +
-                '<td>' + vehiculo + '</td>' +
-                '<td class="text-on-surface-variant">' + r.email + '</td>' +
-                '<td><span class="status-badge" style="' + (STATUS_COLOR[r.status] || '') + '">' + (STATUS_LABEL[r.status] || r.status) + '</span></td>' +
-                '<td class="text-on-surface-variant">' + fecha + '</td>' +
-                '<td></td>';
-            const tdBoton = tr.lastElementChild;
+            // Los datos vienen de visitantes: se insertan siempre como texto, nunca como HTML.
+            const celda = (texto, clase) => {
+                const td = document.createElement('td');
+                if (clase) td.className = clase;
+                td.textContent = texto ?? '';
+                tr.appendChild(td);
+                return td;
+            };
+            celda(r.id, 'font-bold');
+            celda(vehiculo);
+            celda(r.email, 'text-on-surface-variant');
+            const badge = document.createElement('span');
+            badge.className = 'status-badge';
+            badge.style.cssText = STATUS_COLOR[r.status] || '';
+            badge.textContent = STATUS_LABEL[r.status] || r.status;
+            celda('').appendChild(badge);
+            celda(fecha, 'text-on-surface-variant');
+            const tdBoton = celda('');
             const boton = document.createElement('button');
             boton.type = 'button';
             boton.className = 'text-sm font-bold text-primary-container border border-outline-variant rounded-full px-4 py-1.5 hover:bg-surface-container-high';
@@ -478,10 +489,14 @@
 
         const pdfLink = document.getElementById('edit-pdf-link');
         document.getElementById('edit-pdf-file').value = '';
-        if (reporte.report_pdf_url) {
+        // Solo se enlazan PDFs guardados en nuestro propio bucket.
+        const prefijoPdf = SUPABASE_URL + '/storage/v1/object/public/report-pdfs/';
+        if (reporte.report_pdf_url && reporte.report_pdf_url.startsWith(prefijoPdf)) {
             pdfLink.href = reporte.report_pdf_url;
+            pdfLink.rel = 'noopener';
             pdfLink.classList.remove('hidden');
         } else {
+            pdfLink.removeAttribute('href');
             pdfLink.classList.add('hidden');
         }
 
