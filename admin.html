@@ -72,6 +72,15 @@
         input.field[type="file"] { padding: 6px; cursor: pointer; }
         .field::file-selector-button { background: transparent; color: #00e678; border: 1px solid #00e678; border-radius: 999px; padding: 4px 12px; margin-right: 10px; font-weight: 700; cursor: pointer; }
         table.reportes th { color: #9cae9f; }
+        .dato-etiqueta { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #9cae9f; }
+        .dato-valor { font-size: 14px; color: #f0f5ef; overflow-wrap: anywhere; }
+        .foto-celda { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #c7d6c6; }
+        .foto-marco { display: flex; align-items: center; justify-content: center; height: 110px; border-radius: 10px; overflow: hidden; border: 1px solid #3A3A3A; background: #101a12; text-align: center; padding: 0; }
+        .foto-marco img { width: 100%; height: 100%; object-fit: cover; }
+        a.foto-marco:hover { border-color: #00e678; }
+        a.foto-marco:focus-visible { outline: 2px solid #00e678; outline-offset: 2px; }
+        a.foto-marco span { padding: 8px; color: #00e678; font-weight: 700; }
+        .foto-marco.vacia { border-style: dashed; color: #9cae9f; }
     </style>
 </head>
 <body class="bg-level-0 text-on-background font-sans min-h-screen flex flex-col">
@@ -168,6 +177,20 @@
 <button type="button" onclick="cerrarModal()" class="text-on-surface-variant hover:text-on-background" aria-label="Cerrar">
 <span class="material-symbols-outlined" aria-hidden="true">close</span>
 </button>
+</div>
+
+<div class="bg-surface-container-lowest rounded-xl p-4 flex flex-col gap-3">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Datos del auto</p>
+<dl id="datos-auto" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></dl>
+</div>
+
+<div class="bg-surface-container-lowest rounded-xl p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between gap-3">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Fotos del cliente</p>
+<p id="fotos-conteo" class="text-sm font-bold" aria-live="polite"></p>
+</div>
+<p id="fotos-mensaje" class="hidden text-sm"></p>
+<div id="fotos-auto" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -373,7 +396,7 @@
     // --- Dashboard ---
     async function cargarReportes() {
         const { data, error } = await sb.from('reports')
-            .select('id, status, autoscore, risk_level, recommendation_text, report_pdf_url, email, created_at, vehicles ( marca, modelo, anio )')
+            .select('id, status, autoscore, risk_level, recommendation_text, report_pdf_url, email, created_at, vehicle_id, vehicles ( marca, modelo, anio, lugar_compra, kilometraje, precio_venta, niv, placas, estado_placas )')
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -493,6 +516,109 @@
         document.getElementById('puntos-editor').appendChild(filaPuntoValidar(punto));
     }
 
+    // --- Datos y fotos del auto ---
+    const FOTOS_SLOTS = [
+        ['tablero', 'Tablero'], ['niv', 'NIV / Placa'], ['ext-frente', 'Exterior frente'],
+        ['ext-izq', 'Exterior izquierda'], ['ext-der', 'Exterior derecha'], ['ext-trasera', 'Exterior trasera']
+    ];
+
+    function crearElemento(etiqueta, clase, texto) {
+        const el = document.createElement(etiqueta);
+        if (clase) el.className = clase;
+        if (texto !== undefined) el.textContent = texto;
+        return el;
+    }
+
+    function mostrarDatosAuto(v) {
+        const hay = x => x !== null && x !== undefined && String(x).trim() !== '';
+        const texto = x => hay(x) ? String(x) : 'No proporcionado';
+        v = v || {};
+        const datos = [
+            ['Marca', texto(v.marca)], ['Modelo', texto(v.modelo)], ['Año', texto(v.anio)],
+            ['Kilometraje', hay(v.kilometraje) ? Number(v.kilometraje).toLocaleString('es-MX') + ' km' : 'No proporcionado'],
+            ['Precio de venta', hay(v.precio_venta) ? Number(v.precio_venta).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }) : 'No proporcionado'],
+            ['Lugar de compra', texto(v.lugar_compra)],
+            ['NIV', texto(v.niv)], ['Placas', texto(v.placas)], ['Estado de las placas', texto(v.estado_placas)]
+        ];
+        const lista = document.getElementById('datos-auto');
+        lista.replaceChildren(...datos.map(([etiqueta, valor]) => {
+            const grupo = crearElemento('div');
+            grupo.append(crearElemento('dt', 'dato-etiqueta', etiqueta), crearElemento('dd', 'dato-valor', valor));
+            return grupo;
+        }));
+    }
+
+    function celdaFoto(nombre, foto, url) {
+        const celda = crearElemento('div', 'foto-celda');
+        if (!foto) {
+            celda.append(crearElemento('div', 'foto-marco vacia', 'Sin foto'));
+        } else if (!url) {
+            celda.append(crearElemento('div', 'foto-marco', 'No se pudo abrir'));
+        } else {
+            const enlace = crearElemento('a', 'foto-marco');
+            enlace.href = url;
+            enlace.target = '_blank';
+            enlace.rel = 'noopener noreferrer';
+            enlace.setAttribute('aria-label', 'Abrir foto: ' + nombre);
+            const imagen = crearElemento('img');
+            imagen.alt = nombre;
+            // Formatos que el navegador no dibuja (HEIC) quedan como enlace.
+            imagen.onerror = () => imagen.replaceWith(crearElemento('span', '', 'Abrir archivo'));
+            imagen.src = url;
+            enlace.append(imagen);
+            celda.append(enlace);
+        }
+        celda.append(crearElemento('p', '', nombre));
+        return celda;
+    }
+
+    // Las fotos son privadas: se piden ligas temporales (1 hora) con la sesión del administrador.
+    async function cargarFotos(reporte) {
+        const cont = document.getElementById('fotos-auto');
+        const conteo = document.getElementById('fotos-conteo');
+        const mensaje = document.getElementById('fotos-mensaje');
+        const avisar = (texto, color) => {
+            mensaje.textContent = texto;
+            mensaje.style.color = color;
+            mensaje.classList.toggle('hidden', !texto);
+        };
+        cont.replaceChildren();
+        conteo.textContent = '';
+        avisar('Cargando fotos…', '#c7d6c6');
+
+        let fotos = [];
+        const urls = {};
+        try {
+            const { data, error } = await sb.from('vehicle_photos').select('slot, storage_path').eq('vehicle_id', reporte.vehicle_id);
+            if (error) throw error;
+            fotos = data || [];
+            if (fotos.length) {
+                const firmadas = await sb.storage.from('vehicle-photos').createSignedUrls(fotos.map(f => f.storage_path), 3600);
+                if (firmadas.error) throw firmadas.error;
+                firmadas.data.forEach(f => { if (!f.error) urls[f.path] = f.signedUrl; });
+            }
+        } catch (err) {
+            console.error('Error al cargar las fotos', err);
+            if (reporteActual !== reporte) return;
+            avisar('No pudimos cargar las fotos. Cierra el reporte y vuelve a abrirlo.', '#FF5252');
+            return;
+        }
+        // Si ya se abrió otro reporte, estas fotos no corresponden.
+        if (reporteActual !== reporte) return;
+
+        const porSlot = {};
+        fotos.forEach(f => { porSlot[f.slot] = f; });
+        const total = FOTOS_SLOTS.filter(([slot]) => porSlot[slot]).length;
+        conteo.textContent = total + ' de ' + FOTOS_SLOTS.length;
+        conteo.style.color = total === FOTOS_SLOTS.length ? '#00e678' : '#FFAB40';
+        const faltan = FOTOS_SLOTS.length - total;
+        avisar(faltan ? (faltan === 1 ? 'Falta 1 foto.' : 'Faltan ' + faltan + ' fotos.') : '', '#FFAB40');
+        cont.replaceChildren(...FOTOS_SLOTS.map(([slot, nombre]) => {
+            const foto = porSlot[slot];
+            return celdaFoto(nombre, foto, foto && urls[foto.storage_path]);
+        }));
+    }
+
     async function abrirModal(reportId) {
         const reporte = reportesCache.find(r => r.id === reportId);
         if (!reporte) return;
@@ -505,6 +631,8 @@
         const vehiculo = reporte.vehicles ? [reporte.vehicles.marca, reporte.vehicles.modelo, reporte.vehicles.anio].filter(Boolean).join(' ') : '—';
         document.getElementById('modal-titulo').textContent = 'Reporte ' + reporte.id;
         document.getElementById('modal-subtitulo').textContent = vehiculo + ' · ' + reporte.email;
+        mostrarDatosAuto(reporte.vehicles);
+        cargarFotos(reporte);
 
         const selectStatus = document.getElementById('edit-status');
         selectStatus.innerHTML = '';
